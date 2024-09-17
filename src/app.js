@@ -5,7 +5,7 @@ import mongoSanitize from 'express-mongo-sanitize'
 import hpp from 'hpp'
 import compression from 'compression'
 
-import discomfortRoutes from './routes/discomfort.js'
+import routes from './routes/index.js'
 import { globalErrorHandler, unhandledRoutes } from './middleware/error.js'
 
 /* Express app */
@@ -33,7 +33,7 @@ app.use(compression())
 
 /* Mount routers */
 app.get('/api', (req, res) => res.status(200).send('Server is up and running!!!'))
-app.use('/api/discomfort', discomfortRoutes)
+app.use('/api', routes)
 
 app.use(unhandledRoutes)
 app.use(globalErrorHandler)

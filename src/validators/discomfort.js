@@ -1,7 +1,7 @@
 /* eslint-disable consistent-return */
 import { body, validationResult } from 'express-validator'
 
-export const validateCreateDiscomfortRoute = () => {
+const validateCreateDiscomfortRoute = () => {
   return [
     body('hand_and_waist')
       .exists()
@@ -57,18 +57,4 @@ export const validateCreateDiscomfortRoute = () => {
   ]
 }
 
-export const validateCreateBalanceRoute = () => {
-  return [
-    body('id').notEmpty().withMessage('ID is invalid'),
-    body('data').notEmpty().withMessage('Data is invalid'),
-    (req, res, next) => {
-      const errors = validationResult(req)
-
-      if (!errors.isEmpty()) {
-        return next(errors.array())
-      }
-
-      next()
-    },
-  ]
-}
+export default validateCreateDiscomfortRoute

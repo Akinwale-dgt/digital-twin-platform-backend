@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose'
 
-import NumberEnum from '../shared/constants.js'
+import { NumberEnum } from '../shared/constants.js'
 
 const DiscomfortSchema = new Schema(
   {

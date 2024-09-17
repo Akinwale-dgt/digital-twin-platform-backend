@@ -1,46 +1,40 @@
 import { Schema, model } from 'mongoose'
 
-import NumberEnum from '../shared/constants.js'
+import { NumberEnum } from '../shared/constants.js'
 
 const CognitiveWorkloadSchema = new Schema(
   {
-    hand_and_waist: {
+    mental_demand: {
       type: Number,
       enum: NumberEnum,
       required: true,
     },
 
-    upper_arm: {
+    physical_demand: {
       type: Number,
       enum: NumberEnum,
       required: true,
     },
 
-    shoulder: {
+    temporal_demand: {
       type: Number,
       enum: NumberEnum,
       required: true,
     },
 
-    lower_back: {
+    performance: {
       type: Number,
       enum: NumberEnum,
       required: true,
     },
 
-    thigh: {
+    effort: {
       type: Number,
       enum: NumberEnum,
       required: true,
     },
 
-    neck: {
-      type: Number,
-      enum: NumberEnum,
-      required: true,
-    },
-
-    lower_leg_and_foot: {
+    frustration: {
       type: Number,
       enum: NumberEnum,
       required: true,
