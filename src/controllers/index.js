@@ -1,7 +1,9 @@
 /* eslint-disable consistent-return */
+import { createBalance } from '../service/balance.js'
 import { createCognitiveWorkload } from '../service/cognitiveWorkload.js'
 import { createDiscomfort } from '../service/discomfort.js'
 import { createExertion } from '../service/exertion.js'
+import { createSituationalAwareness } from '../service/siruationAwareness.js'
 
 export const createDiscomfortController = async (req, res, next) => {
   try {
@@ -36,6 +38,32 @@ export const createExertionController = async (req, res, next) => {
     return res.status(200).send({
       status: 'success',
       message: 'Exertion recorded',
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const createBalanceController = async (req, res, next) => {
+  try {
+    await createBalance(req.body)
+
+    return res.status(200).send({
+      status: 'success',
+      message: 'Balance recorded',
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const createSituationalAwarenessController = async (req, res, next) => {
+  try {
+    await createSituationalAwareness(req.body)
+
+    return res.status(200).send({
+      status: 'success',
+      message: 'Situational awareness recorded',
     })
   } catch (error) {
     next(error)
