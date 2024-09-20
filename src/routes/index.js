@@ -5,7 +5,8 @@ import {
   createExertionController,
   createBalanceController,
   createSituationalAwarenessController,
-} from '../controllers/index.js'
+} from '../controllers/inputData.js'
+import { analyzeSubjectiveData } from '../controllers/analyzeData.js'
 import validateCreateDiscomfortRoute from '../validators/discomfort.js'
 import validateCreateCognitiveWorkloadRoute from '../validators/cognitiveWorkload.js'
 import validateCreateExertionRoute from '../validators/exertion.js'
@@ -27,5 +28,7 @@ router.post(
   validateCreateSituationalAwarenessRoute(),
   createSituationalAwarenessController,
 )
+
+router.post('/analyze-subjective-data', analyzeSubjectiveData)
 
 export default router

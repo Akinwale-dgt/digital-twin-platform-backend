@@ -3,7 +3,7 @@ import { createBalance } from '../service/balance.js'
 import { createCognitiveWorkload } from '../service/cognitiveWorkload.js'
 import { createDiscomfort } from '../service/discomfort.js'
 import { createExertion } from '../service/exertion.js'
-import { createSituationalAwareness } from '../service/siruationAwareness.js'
+import { createSituationalAwareness } from '../service/situationAwareness.js'
 
 export const createDiscomfortController = async (req, res, next) => {
   try {
