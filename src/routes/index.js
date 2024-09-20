@@ -29,6 +29,6 @@ router.post(
   createSituationalAwarenessController,
 )
 
-router.post('/analyze-subjective-data', analyzeSubjectiveData)
+router.get('/analyze-subjective-data', analyzeSubjectiveData)
 
 export default router
