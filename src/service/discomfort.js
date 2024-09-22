@@ -32,9 +32,46 @@ export const averageDiscomfort = async () => {
         },
       },
     ])
+
     return result.length > 0 ? result[0]?.overallAverage : 0
   } catch (error) {
     logger.error('Error calculating average:', error)
+    throw error
+  }
+}
+
+export const averageDiscomfortByField = async () => {
+  try {
+    const result = await Discomfort.aggregate([
+      {
+        $group: {
+          _id: null,
+          avgHandAndWaist: { $avg: '$hand_and_waist' },
+          avgUpperArm: { $avg: '$upper_arm' },
+          avgShoulder: { $avg: '$shoulder' },
+          avgLowerBack: { $avg: '$lower_back' },
+          avgThigh: { $avg: '$thigh' },
+          avgNeck: { $avg: '$neck' },
+          avgLowerLegAndFoot: { $avg: '$lower_leg_and_foot' },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          avgHandAndWaist: '$avgHandAndWaist',
+          avgUpperArm: '$avgUpperArm',
+          avgShoulder: '$avgShoulder',
+          avgLowerBack: '$avgLowerBack',
+          avgThigh: '$avgThigh',
+          avgNeck: '$avgNeck',
+          avgLowerLegAndFoot: '$avgLowerLegAndFoot',
+        },
+      },
+    ])
+
+    return result.length > 0 ? result[0] : {}
+  } catch (error) {
+    logger.error('Error calculating averages by field:', error)
     throw error
   }
 }
