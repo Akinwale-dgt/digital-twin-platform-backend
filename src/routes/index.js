@@ -5,6 +5,7 @@ import {
   createExertionController,
   createBalanceController,
   createSituationalAwarenessController,
+  uploadFileController,
 } from '../controllers/inputData.js'
 import { analyzeSubjectiveData } from '../controllers/analyzeData.js'
 import validateCreateDiscomfortRoute from '../validators/discomfort.js'
@@ -12,6 +13,7 @@ import validateCreateCognitiveWorkloadRoute from '../validators/cognitiveWorkloa
 import validateCreateExertionRoute from '../validators/exertion.js'
 import validateCreateBalanceRoute from '../validators/balance.js'
 import validateCreateSituationalAwarenessRoute from '../validators/situationalAwareness.js'
+import uploadFile from '../middleware/upload.js'
 
 const router = express.Router()
 
@@ -30,5 +32,7 @@ router.post(
 )
 
 router.get('/analyze-subjective-data', analyzeSubjectiveData)
+
+router.post('/upload-file', uploadFile, uploadFileController)
 
 export default router
