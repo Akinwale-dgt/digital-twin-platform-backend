@@ -23,6 +23,29 @@ export const analyzeSubjectiveData = async (req, res, next) => {
     const totalAverageCognitiveWorkloadByField = await averageCognitiveWorkloadByField()
     const totalAverageSituationalAwarenessByField = await averageSituationalAwarenessByField()
 
+    const totalOfAverages =
+      totalAverageBalance +
+      totalAverageCognitiveWorkload +
+      totalAverageExertion +
+      totalAverageSituationalAwareness +
+      totalAverageDiscomfort
+
+    const totalAveragePercentDiscomfort = (totalAverageDiscomfort / totalOfAverages) * 100
+    const totalAveragePercentBalance = (totalAverageBalance / totalOfAverages) * 100
+    const totalAveragePercentExertion = (totalAverageExertion / totalOfAverages) * 100
+    const totalAveragePercentCognitiveWorkload =
+      (totalAverageCognitiveWorkload / totalOfAverages) * 100
+    const totalAveragePercentSituationalAwareness =
+      (totalAverageSituationalAwareness / totalOfAverages) * 100
+
+    const weightedSumRating =
+      (totalAveragePercentBalance +
+        totalAveragePercentCognitiveWorkload +
+        totalAveragePercentExertion +
+        totalAveragePercentDiscomfort +
+        totalAveragePercentSituationalAwareness) /
+      5
+
     const dataObject = {
       discomfort: {
         average_hand_and_wait: totalAverageDiscomfortByField?.avgHandAndWaist,
@@ -69,6 +92,7 @@ export const analyzeSubjectiveData = async (req, res, next) => {
       balance: {
         totalAverage: totalAverageBalance,
       },
+      weightedSumRating,
     }
 
     return res.status(200).send({
