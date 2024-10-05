@@ -2,10 +2,15 @@
 import httpError from 'http-errors'
 
 import { createBalance } from '../service/balance.js'
-import { createCognitiveWorkload } from '../service/cognitiveWorkload.js'
+import {
+  createCognitiveWorkload,
+  processCognitiveWorkloadData,
+} from '../service/cognitiveWorkload.js'
 import { createDiscomfort } from '../service/discomfort.js'
-import { createExertion } from '../service/exertion.js'
+import { createExertion, processExertionData } from '../service/exertion.js'
 import { createSituationalAwareness } from '../service/situationAwareness.js'
+import processFallRiskData from '../service/fallRisk.js'
+import { Measure } from '../shared/constants.js'
 
 export const createDiscomfortController = async (req, res, next) => {
   try {
@@ -84,10 +89,19 @@ export const uploadFileController = async (req, res, next) => {
 
     const data = req.file.buffer.toString()
 
+    let processedData
+    if (req.body.measure === Measure.cognitiveWorkload) {
+      processedData = await processCognitiveWorkloadData(data.replace(/\r/g, ''))
+    } else if (req.body.measure === Measure.fallRisk) {
+      processedData = await processFallRiskData(data.replace(/\r/g, ''))
+    } else if (req.body.measure === Measure.exertion) {
+      processedData = await processExertionData(data.replace(/\r/g, ''))
+    }
+
     return res.status(200).send({
       status: 'success',
       message: 'File uploaded successfully',
-      data,
+      data: processedData,
     })
   } catch (error) {
     next(error)
