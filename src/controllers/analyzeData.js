@@ -23,20 +23,11 @@ export const analyzeSubjectiveData = async (req, res, next) => {
     const totalAverageCognitiveWorkloadByField = await averageCognitiveWorkloadByField()
     const totalAverageSituationalAwarenessByField = await averageSituationalAwarenessByField()
 
-    const totalOfAverages =
-      totalAverageBalance +
-      totalAverageCognitiveWorkload +
-      totalAverageExertion +
-      totalAverageSituationalAwareness +
-      totalAverageDiscomfort
-
-    const totalAveragePercentDiscomfort = (totalAverageDiscomfort / totalOfAverages) * 100
-    const totalAveragePercentBalance = (totalAverageBalance / totalOfAverages) * 100
-    const totalAveragePercentExertion = (totalAverageExertion / totalOfAverages) * 100
-    const totalAveragePercentCognitiveWorkload =
-      (totalAverageCognitiveWorkload / totalOfAverages) * 100
-    const totalAveragePercentSituationalAwareness =
-      (totalAverageSituationalAwareness / totalOfAverages) * 100
+    const totalAveragePercentDiscomfort = (totalAverageDiscomfort / 70) * 100
+    const totalAveragePercentBalance = (totalAverageBalance / 10) * 100
+    const totalAveragePercentExertion = (totalAverageExertion / 20) * 100
+    const totalAveragePercentCognitiveWorkload = (totalAverageCognitiveWorkload / 120) * 100
+    const totalAveragePercentSituationalAwareness = (totalAverageSituationalAwareness / 63) * 100
 
     const weightedSumRating =
       (totalAveragePercentBalance +

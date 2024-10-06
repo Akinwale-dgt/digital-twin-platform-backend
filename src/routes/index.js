@@ -14,6 +14,7 @@ import validateCreateExertionRoute from '../validators/exertion.js'
 import validateCreateBalanceRoute from '../validators/balance.js'
 import validateCreateSituationalAwarenessRoute from '../validators/situationalAwareness.js'
 import uploadFile from '../middleware/upload.js'
+import resetSubjectiveController from '../controllers/reset.js'
 
 const router = express.Router()
 
@@ -34,5 +35,7 @@ router.post(
 router.get('/analyze-subjective-data', analyzeSubjectiveData)
 
 router.post('/upload-file', uploadFile, uploadFileController)
+
+router.delete('/reset', resetSubjectiveController)
 
 export default router

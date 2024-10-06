@@ -3,17 +3,17 @@ import { Schema, model } from 'mongoose'
 const ObjectiveExertionSchema = new Schema(
   {
     low: {
-      type: Number,
+      type: String,
       required: true,
     },
 
     medium: {
-      type: Number,
+      type: String,
       required: true,
     },
 
     high: {
-      type: Number,
+      type: String,
       required: true,
     },
   },
