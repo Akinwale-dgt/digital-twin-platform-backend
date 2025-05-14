@@ -8,6 +8,8 @@ export const CognitiveWorkloadEnum = [
 
 export const SituationalAwarenessEnum = [1, 2, 3, 4, 5, 6, 7]
 
+export const UsabilityEnum = [1, 2, 3, 4, 5]
+
 export const Measure = {
   cognitiveWorkload: 'cognitive-workload',
   exertion: 'exertion',
