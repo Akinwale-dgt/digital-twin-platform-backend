@@ -11,6 +11,7 @@ import { createExertion, processExertionData } from '../service/exertion.js'
 import { createSituationalAwareness } from '../service/situationAwareness.js'
 import processFallRiskData from '../service/fallRisk.js'
 import { Measure } from '../shared/constants.js'
+import { createUsability } from '../service/usability.js'
 
 export const createDiscomfortController = async (req, res, next) => {
   try {
@@ -71,6 +72,19 @@ export const createSituationalAwarenessController = async (req, res, next) => {
     return res.status(200).send({
       status: 'success',
       message: 'Situational awareness recorded',
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const createUsabilityController = async (req, res, next) => {
+  try {
+    await createUsability(req.body)
+
+    return res.status(200).send({
+      status: 'success',
+      message: 'Usability recorded',
     })
   } catch (error) {
     next(error)
