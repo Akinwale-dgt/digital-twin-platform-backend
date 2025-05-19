@@ -16,7 +16,10 @@ import validateCreateBalanceRoute from '../validators/balance.js'
 import validateCreateSituationalAwarenessRoute from '../validators/situationalAwareness.js'
 import uploadFile from '../middleware/upload.js'
 import resetSubjectiveController from '../controllers/reset.js'
+import { analyzeDataController } from '../controllers/analyze.js'
+import { downloadReportController, getReportController, reportStatusController } from '../controllers/report.js'
 import validateCreateUsabilityRoute from '../validators/usability.js'
+
 
 const router = express.Router()
 
@@ -40,6 +43,16 @@ router.post(
   createUsabilityController,
 )
 router.get('/analyze-subjective-data', analyzeSubjectiveData)
+
+// router.post('/analyze-data', analyzeDataController)
+router.get('/analyze-data', analyzeDataController)
+
+// API endpoint to check report status
+router.get('/report/:reportId/status', reportStatusController)
+// API endpoint to download the report
+router.get('/download-report/:reportId', downloadReportController)
+// API endpoint to get the full report data (including JSON results)
+router.get('/report/:reportId', getReportController)
 
 router.post('/upload-file', uploadFile, uploadFileController)
 
