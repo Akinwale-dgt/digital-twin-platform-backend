@@ -1,9 +1,13 @@
+/* eslint-disable no-use-before-define */
+/* eslint-disable camelcase */
+/* eslint-disable import/no-extraneous-dependencies */
 import { ChatOpenAI } from '@langchain/openai'
 import dotenv from 'dotenv'
 import { RunnableSequence } from '@langchain/core/runnables'
 import { StructuredOutputParser } from '@langchain/core/output_parsers'
 import { PromptTemplate } from '@langchain/core/prompts'
 import { z } from 'zod'
+import { fixNullValues } from '../shared/digital_twin.js'
 
 /* Load environment variables into Node.js process */
 dotenv.config()
@@ -19,7 +23,7 @@ export const analyze = async (inputData) => {
   const parser = StructuredOutputParser.fromZodSchema(
     z.object({
       cognitive_load: z.object({
-        raw_scores: overall_cognitive_load,
+        raw_scores: cognitiveLoad,
         categories: z.object({
           mental_demand: z.enum(['Low', 'Medium', 'High']),
           physical_demand: z.enum(['Low', 'Medium', 'High']),
@@ -31,22 +35,10 @@ export const analyze = async (inputData) => {
         overall_score: z.number().min(0).max(120),
         overall_category: z.enum(['Low', 'Medium', 'High']),
       }),
-      // .refine((data) => {
-      //   const { raw_scores } = data.cognitive_load
-      //   const overall_score = Object.values(raw_scores).reduce((acc, score) => acc + score, 0)
-      //   const overall_category =
-      //     overall_score <= 33 ? 'Low' : overall_score <= 67 ? 'Medium' : 'High'
-      //   return (
-      //     data.cognitive_load.overall_score === overall_score &&
-      //     data.cognitive_load.overall_category === overall_category
-      //   )
-      // }),
       discomfort: z.object({
-        raw_scores: overall_discomfort,
+        raw_scores: discomfort,
         categories: z.object({
           hand_wrist: z.enum(['Low', 'Medium', 'High']),
-          physical_demand: z.enum(['Low', 'Medium', 'High']),
-          chest: z.enum(['Low', 'Medium', 'High']),
           upper_arm: z.enum(['Low', 'Medium', 'High']),
           shoulder: z.enum(['Low', 'Medium', 'High']),
           lower_back: z.enum(['Low', 'Medium', 'High']),
@@ -122,8 +114,6 @@ export const analyze = async (inputData) => {
         - "discomfort": {{
             "raw_scores": {{
               "hand_wrist": number,
-              "physical_demand": number,
-              "chest": number,
               "upper_arm": number,
               "shoulder": number,
               "lower_back": number,
@@ -133,8 +123,6 @@ export const analyze = async (inputData) => {
             }},
             "categories": {{
               "hand_wrist": "Low" | "Medium" | "High",
-              "physical_demand": "Low" | "Medium" | "High",
-              "chest": "Low" | "Medium" | "High",
               "upper_arm": "Low" | "Medium" | "High",
               "shoulder": "Low" | "Medium" | "High",
               "lower_back": "Low" | "Medium" | "High",
@@ -153,6 +141,7 @@ export const analyze = async (inputData) => {
           }}
         
         DO NOT return any text or explanation outside this JSON.
+        DO NOT use null values - always provide valid numbers and categories.
         `),
     model,
     parser,
@@ -163,6 +152,33 @@ export const analyze = async (inputData) => {
     return result
   } catch (error) {
     console.error('Error:', error)
+
+    // Enhanced error handling with fallback parsing
+    if (error.name === 'OutputParserException' && error.llmOutput) {
+      console.log('Attempting manual parsing of LLM output...')
+
+      try {
+        // Extract JSON from the output
+        let jsonString = error.llmOutput
+
+        // Remove markdown code blocks if present
+        if (jsonString.includes('```json')) {
+          jsonString = jsonString.substring(jsonString.indexOf('```json') + 7)
+          jsonString = jsonString.substring(0, jsonString.lastIndexOf('```'))
+        }
+
+        const parsedData = JSON.parse(jsonString)
+
+        // Fix null values in the parsed data
+        const fixedData = fixNullValues(parsedData)
+
+        console.log('Successfully parsed and fixed data manually')
+        return fixedData
+      } catch (parseError) {
+        console.error('Manual parsing also failed:', parseError)
+      }
+    }
+
     throw error
   }
 }
@@ -172,7 +188,7 @@ const boundedNumber = (min, max, description) =>
     .preprocess((val) => Number(val), z.number().min(min).max(max))
     .describe(description || `Must be a number between ${min} and ${max}`)
 
-export const overall_cognitive_load = z.object({
+export const cognitiveLoad = z.object({
   mental_demand: boundedNumber(
     0,
     20,
@@ -205,17 +221,17 @@ export const overall_cognitive_load = z.object({
   ),
 })
 
-export const overall_discomfort = z.object({
+export const discomfort = z.object({
   hand_wrist: boundedNumber(
     0,
     10,
     "Hand and wrist discomfort, should be a number between 0 and 10. If the number is not between 0 and 10, please return '0'.",
   ),
-  chest: boundedNumber(
-    0,
-    10,
-    "Chest discomfort, should be a number between 0 and 10. If the number is not between 0 and 10, please return '0'.",
-  ),
+  // chest: boundedNumber(
+  //   0,
+  //   10,
+  //   "Chest discomfort, should be a number between 0 and 10. If the number is not between 0 and 10, please return '0'.",
+  // ),
   upper_arm: boundedNumber(
     0,
     10,
