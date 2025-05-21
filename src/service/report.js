@@ -18,7 +18,7 @@ async function generateReport(inputData) {
     // const result = await chain.invoke({ input_data: JSON.stringify(inputData) })
     const result = await chain.invoke({ input: inputData })
     logger.info('Result:')
-    logger.info(result)
+    // logger.info(result)
     // logger.info(`Report generated successfully: \n\n${JSON.stringify(result, null, 2)}`)
     return result
   } catch (error) {
