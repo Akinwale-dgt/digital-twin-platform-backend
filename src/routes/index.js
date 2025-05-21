@@ -16,7 +16,7 @@ import validateCreateBalanceRoute from '../validators/balance.js'
 import validateCreateSituationalAwarenessRoute from '../validators/situationalAwareness.js'
 import uploadFile from '../middleware/upload.js'
 import resetSubjectiveController from '../controllers/reset.js'
-import { analyzeDataController } from '../controllers/analyze.js'
+import analyzeDataController from '../controllers/analyze.js'
 import { downloadReportController, getReportController, reportStatusController } from '../controllers/report.js'
 import validateCreateUsabilityRoute from '../validators/usability.js'
 
