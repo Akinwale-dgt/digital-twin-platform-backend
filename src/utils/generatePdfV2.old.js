@@ -23,10 +23,10 @@ const match = (reportData, title) => {
         'i',
       ),
     ) ||
-    // Then try hashtag headers: ## or ### Title
+    // Try hashtag headers with variable levels: ### or #### Title
     reportData.report_markdown.match(
       new RegExp(
-        `#{2,3}\\s*${escapedTitle}\\s+([\\s\\S]+?)(?=\\n#{1,6}\\s|\\n\\n#{1,6}\\s|$)`,
+        `#{2,4}\\s*${escapedTitle}\\s+([\\s\\S]+?)(?=\\n#{1,6}\\s|\\n\\n#{1,6}\\s|$)`,
         'i',
       ),
     ) ||
@@ -61,6 +61,26 @@ const addSubject = (doc, contexts, title) => {
   }
 }
 
+// Function to add a bulleted list from markdown-style list to PDF
+const addBulletedList = (doc, text) => {
+  if (!text) return;
+  
+  const lines = text.split('\n');
+  const bulletedLines = lines.filter(line => line.trim().startsWith('-'));
+  
+  bulletedLines.forEach(line => {
+    // Extract content after the bullet
+    const content = line.trim().substring(1).trim();
+    doc.text(`• ${content}`, {
+      indent: 10,
+      align: 'left',
+      width: doc.page.width - 110 // Account for indent
+    });
+  });
+  
+  doc.moveDown();
+};
+
 // Function to generate a PDF from the report data
 async function generatePDF(reportData, reportId) {
   return new Promise((resolve, reject) => {
@@ -88,15 +108,11 @@ async function generatePDF(reportData, reportId) {
       doc.fontSize(12).text(`Unified NetScore: ${reportData.netscore.toFixed(3)}`)
       doc.moveDown()
 
-      // Extract just the narrative part before any table or section headers
-      const narrativeMatch =
-        match(reportData, 'Unified NetScore') ||
-        reportData.report_markdown.match(
-          /# Exoskeleton Use Report\s+([\s\S]+?)(?=\||\n##|\n\n##|$)/,
-        )
-      if (narrativeMatch && narrativeMatch.length > 0) {
+      // Extract narrative part - look for Analysis section in new format
+      const analysisMatch = match(reportData, 'Analysis')
+      if (analysisMatch && analysisMatch.length > 0) {
         // Clean up the extracted text - remove any table remnants
-        let narrativeText = narrativeMatch[1].trim()
+        let narrativeText = analysisMatch[1].trim()
 
         // Remove any lines that look like table headers or separators
         narrativeText = narrativeText
@@ -116,11 +132,64 @@ async function generatePDF(reportData, reportId) {
           .trim()
 
         // Only add if there's meaningful narrative content
-        if (narrativeText && narrativeText.length > 50) {
+        if (narrativeText && narrativeText.length > 10) {
           doc.text(narrativeText)
+        }
+      } else {
+        // Fallback to old format - extract just the narrative part before any table or section headers
+        const narrativeMatch =
+          match(reportData, 'Unified NetScore') ||
+          reportData.report_markdown.match(
+            /# Exoskeleton Use Report\s+([\s\S]+?)(?=\||\n##|\n\n##|$)/,
+          )
+        if (narrativeMatch && narrativeMatch.length > 0) {
+          // Clean up the extracted text - remove any table remnants
+          let narrativeText = narrativeMatch[1].trim()
+
+          // Remove any lines that look like table headers or separators
+          narrativeText = narrativeText
+            .split('\n')
+            .filter((line) => {
+              const trimmedLine = line.trim()
+              // Filter out table-like lines
+              return (
+                !trimmedLine.includes('|') &&
+                !trimmedLine.includes('---') &&
+                !trimmedLine.startsWith('Criterion') &&
+                trimmedLine.length > 0
+              )
+            })
+            .join(' ')
+            .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+            .trim()
+
+          // Only add if there's meaningful narrative content
+          if (narrativeText && narrativeText.length > 50) {
+            doc.text(narrativeText)
+          }
         }
       }
       doc.moveDown()
+
+      // Add subjective inputs section (new format)
+      const subjectiveMatch = match(reportData, 'Subjective Inputs')
+      if (subjectiveMatch && subjectiveMatch.length > 0) {
+        doc.fontSize(16).text('Subjective Inputs', { underline: true })
+        doc.moveDown()
+        
+        // Add bulleted list
+        addBulletedList(doc, subjectiveMatch[1].trim())
+      }
+
+      // Add objective metrics section (new format)
+      const objectiveMatch = match(reportData, 'Objective Metrics')
+      if (objectiveMatch && objectiveMatch.length > 0) {
+        doc.fontSize(16).text('Objective Metrics', { underline: true })
+        doc.moveDown()
+        
+        // Add bulleted list
+        addBulletedList(doc, objectiveMatch[1].trim())
+      }
 
       // Add Facilitators vs Barriers Table
       doc.fontSize(16).text('Facilitators vs Barriers', { underline: true })
@@ -193,23 +262,11 @@ async function generatePDF(reportData, reportId) {
       doc.x = 50 // Reset to left margin
       doc.fontSize(12) // Reset font size
 
-      // Try bold format first: **Analysis Highlights and Recommendations:**
-      const recommendationsMatch =
-        reportData.report_markdown.match(
-          /\*\*\s*Analysis Highlights and Recommendations\s*:?\*\*\s*\n([\s\S]+?)(?=\n\*\*|\n\n\*\*|\n#{1,6}\s|$)/,
-        ) ||
-        reportData.report_markdown.match(
-          /#{2,3}\s*Analysis Highlights and Recommendations\s+([\s\S]+?)(?=\n#{1,6}\s|\n\n#{1,6}\s|$)/,
-        ) ||
-        reportData.report_markdown.match(
-          /Analysis Highlights and Recommendations\s*:?\s*\n([\s\S]+?)(?=\n[A-Z]|\n\n[A-Z]|$)/,
-        )
-
-      if (recommendationsMatch && recommendationsMatch.length > 0) {
-        // doc.moveTo(0, currentRowTop + 30)
-
+      // Check for Highlights section (new format)
+      const highlightsMatch = match(reportData, 'Highlights')
+      if (highlightsMatch && highlightsMatch.length > 0) {
         doc.fontSize(16)
-        doc.text('Analysis Highlights and Recommendations', 50, doc.y, {
+        doc.text('Highlights', 50, doc.y, {
           underline: true,
           align: 'left',
           continued: false,
@@ -221,16 +278,80 @@ async function generatePDF(reportData, reportId) {
         doc.x = 50 // Ensure we're at left margin
 
         // Add the content with explicit left margin and width
-        doc.text(recommendationsMatch[1].trim(), 50, doc.y, {
+        doc.text(highlightsMatch[1].trim(), 50, doc.y, {
           align: 'left',
           width: doc.page.width - 100, // Leave margin on both sides
         })
-      } else {
-        const analysisMatch = match(reportData, 'Analysis Highlights')
-        addSubject(doc, analysisMatch, 'Analysis Highlights')
+        
+        doc.moveDown()
+      }
 
-        const recommendsMatch = match(reportData, 'Recommendations')
-        addSubject(doc, recommendsMatch, 'Recommendations')
+      // Check for Recommendations section (new format)
+      const recommendsMatch = match(reportData, 'Recommendations')
+      if (recommendsMatch && recommendsMatch.length > 0) {
+        doc.fontSize(16)
+        doc.text('Recommendations', 50, doc.y, {
+          underline: true,
+          align: 'left',
+          continued: false,
+        })
+
+        // Move down and explicitly position the content
+        doc.fontSize(12)
+        doc.y += 30 // Add space after header
+        doc.x = 50 // Ensure we're at left margin
+
+        // Add the content with explicit left margin and width 
+        // Use bulleted list format for recommendations if they start with "-"
+        const recText = recommendsMatch[1].trim();
+        if (recText.includes('- ')) {
+          addBulletedList(doc, recText);
+        } else {
+          doc.text(recText, 50, doc.y, {
+            align: 'left',
+            width: doc.page.width - 100, // Leave margin on both sides
+          });
+        }
+      } else {
+        // Try old format for recommendations and analysis highlights
+        const recommendationsMatch =
+          reportData.report_markdown.match(
+            /\*\*\s*Analysis Highlights and Recommendations\s*:?\*\*\s*\n([\s\S]+?)(?=\n\*\*|\n\n\*\*|\n#{1,6}\s|$)/,
+          ) ||
+          reportData.report_markdown.match(
+            /#{2,3}\s*Analysis Highlights and Recommendations\s+([\s\S]+?)(?=\n#{1,6}\s|\n\n#{1,6}\s|$)/,
+          ) ||
+          reportData.report_markdown.match(
+            /Analysis Highlights and Recommendations\s*:?\s*\n([\s\S]+?)(?=\n[A-Z]|\n\n[A-Z]|$)/,
+          )
+
+        if (recommendationsMatch && recommendationsMatch.length > 0) {
+          // doc.moveTo(0, currentRowTop + 30)
+
+          doc.fontSize(16)
+          doc.text('Analysis Highlights and Recommendations', 50, doc.y, {
+            underline: true,
+            align: 'left',
+            continued: false,
+          })
+
+          // Move down and explicitly position the content
+          doc.fontSize(12)
+          doc.y += 30 // Add space after header
+          doc.x = 50 // Ensure we're at left margin
+
+          // Add the content with explicit left margin and width
+          doc.text(recommendationsMatch[1].trim(), 50, doc.y, {
+            align: 'left',
+            width: doc.page.width - 100, // Leave margin on both sides
+          })
+        } else {
+          const analysisHighlightMatch = match(reportData, 'Analysis Highlights')
+          addSubject(doc, analysisHighlightMatch, 'Analysis Highlights')
+
+          const oldRecommendsMatch = match(reportData, 'Recommendations')
+          addSubject(doc, oldRecommendsMatch, 'Recommendations')
+        }
       }
 
       // Add chart placeholder text
