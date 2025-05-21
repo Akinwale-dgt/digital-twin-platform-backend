@@ -50,8 +50,8 @@ router.get('/analyze-data', analyzeDataController)
 // API endpoint to check report status
 router.get('/report/:reportId/status', reportStatusController)
 // API endpoint to download the report
-router.get('/download-report/:reportId', downloadReportController)
-router.get('/reports/:reportId/view', viewReportController)
+router.get('/report/:reportId/download', downloadReportController)
+router.get('/report/:reportId/view', viewReportController)
 // API endpoint to get the full report data (including JSON results)
 router.get('/report/:reportId', getReportController)
 
