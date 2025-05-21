@@ -17,7 +17,7 @@ import validateCreateSituationalAwarenessRoute from '../validators/situationalAw
 import uploadFile from '../middleware/upload.js'
 import resetSubjectiveController from '../controllers/reset.js'
 import analyzeDataController from '../controllers/analyze.js'
-import { downloadReportController, getReportController, reportStatusController } from '../controllers/report.js'
+import { downloadReportController, getReportController, reportStatusController, viewReportController } from '../controllers/report.js'
 import validateCreateUsabilityRoute from '../validators/usability.js'
 
 
@@ -51,6 +51,7 @@ router.get('/analyze-data', analyzeDataController)
 router.get('/report/:reportId/status', reportStatusController)
 // API endpoint to download the report
 router.get('/download-report/:reportId', downloadReportController)
+router.get('/reports/:reportId/view', viewReportController)
 // API endpoint to get the full report data (including JSON results)
 router.get('/report/:reportId', getReportController)
 

@@ -1,14 +1,14 @@
 import Bull from 'bull'
-import path from 'path'
-import { fileURLToPath } from 'url'
+// import path from 'path'
+// import { fileURLToPath } from 'url'
 import Report from '../models/report.js'
 import generateReport from '../service/report.js'
-import generatePDF from '../utils/generatePdfV3.js'
+// import generatePDF from '../utils/generatePdfV3.js'
 import logger from '../utils/customLogger.js'
 
 // Get the directory name equivalent for ES modules
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+// const __filename = fileURLToPath(import.meta.url)
+// const __dirname = path.dirname(__filename)
 
 // Create a queue for background processing
 const reportGenerationQueue = new Bull('report-generation', {
@@ -31,16 +31,16 @@ reportGenerationQueue.process(async (job) => {
     // console.log('Report data:', reportData)
 
     // Generate PDF
-    const pdfPath = await generatePDF(reportData, reportId)
+    // const pdfPath = await generatePDF(reportData, reportId)
 
     // Store the relative path in the database
-    const relativePdfPath = path.relative(__dirname, pdfPath)
+    // const relativePdfPath = path.relative(__dirname, pdfPath)
 
     // Update the report in the database
     await Report.findByIdAndUpdate(reportId, {
       status: 'completed',
       results: { report_markdown: reportData.content, id: reportData.id },
-      pdfPath: relativePdfPath,
+      // pdfPath: relativePdfPath,
     })
 
     return { reportId, status: 'completed' }
