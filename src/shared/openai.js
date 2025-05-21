@@ -6,7 +6,7 @@ dotenv.config()
 
 const model = new ChatOpenAI({
   model: process.env.OPENAI_MODEL,
-  temperature: process.env.OPENAI_TEMPERATURE,
+  temperature: parseFloat(process.env.OPENAI_TEMPERATURE),
   openAIApiKey: process.env.OPENAI_API_KEY,
   // maxTokens: 4000,
 })
