@@ -14,11 +14,11 @@ export const REPORT_TEMPLATE = `
        Save results as "subjective_norm".
 
     2. Infer & Normalize Objective Metrics (0–1) from subjective_norm:
-       – cognitive_load_psd  
-       – fall_risk_pressure  
-       – muscle_activity  
-       – range_of_motion  
-       – exertion_ppg_eda  
+       – cognitive_load_psd  from TLX
+       – fall_risk_pressure  from Balance
+       – muscle_activity_EMG from Discomfort 
+       – range_of_motion_IMU From Discomfort & Usability
+       – exertion_ppg_eda    from exertion
 
     3. Compute Facilitator Vector Fi:
        physical_exertion_reduction = 1 – muscle_activity  
@@ -38,7 +38,7 @@ export const REPORT_TEMPLATE = `
        usability_concern  = 1 – mean(subjective_norm.usability.*)  
 
     5. Entropy-Method Weights:
-       Compute weight w_j for each of the 13 criteria (7 Fi + 6 Bi) using the entropy method.
+       Compute weight w_j for each of the 13 criteria (7 Fi + 6 Bi) using the entropy method.•	Entropy Method: The EWM is an objective weighting technique rooted in information theory. It operates on the premise that the more dispersed or varied the data for a particular criterion across alternatives, the more information that criterion provides for decision-making. Consequently, such criteria are assigned higher weights.
 
     6. Unified NetScore:
        NetScore = sum(all Fi values) – sum(all Bi values), i.e., ∑ w_i·Fi – ∑ w_j·Bj 
@@ -46,101 +46,18 @@ export const REPORT_TEMPLATE = `
     7. Generate a full report in Markdown format with the following structure:
        # Exoskeleton Use Report
 
-       Start by providing the normalized rating of the subjective inputs.
+      Start by providing the normalized rating of the subjective inputs.
 
-       Next, provide the inferred and normalized objective metrics.
+      Next, provide the inferred and normalized objective metrics.
 
-       Next, Provide the facilitators and barriers with their entropy weight and show how the net weight (i.e., the unified score)
+      Next, Provide the facilitators and barriers with their entropy weight and show how the net weight (i.e., the unified score)
        A Markdown table with columns:
        Criterion | Facilitator (Fi) | Barrier (Bi) | Weight
        One row per criterion.
 
-       Next, Prepare A short note explaining the analysis from the subjective analysis results to the Unified NetScore of Benefit-Risk analysis and identifying the top facilitator and top barrier.
+      Next, Prepare A short note explaining the analysis from the subjective analysis results to the Unified NetScore of Benefit-Risk analysis and identifying the top facilitator and top barrier.
 
-       Add analysis highlights and recommendations.
-       ---
-    Return ONLY a valid JSON object with the following top-level keys:
-
-        
-    - "subjective_norm": {{
-        "cognitive_load": {{
-          "mental_demand": number,
-          "physical_demand": number,
-          "temporal_demand": number,
-          "performance": number,
-          "effort": number,
-          "frustration": number,
-        }},
-        "discomfort": {{
-          "hand_wrist": number,
-          "upper_arm": number,
-          "shoulder": number,
-          "lower_back": number,
-          "thigh": number,
-          "neck": number,
-          "lower_leg_foot": number,
-        }},
-        "exertion": number,
-        "balance": number,
-        "situational_awareness": {{
-          "instability_of_situation": number,
-          "complexity_of_situation": number,
-          "variability_of_situation": number,
-          "arousal": number,
-          "concentration_of_attention": number,
-          "division_of_attention": number,
-          "spare_mental_capacity": number,
-          "information_quantity": number,
-          "familiarity_with_situation": number,
-        }},
-        "usability": {{
-          "ease_of_use": number,
-          "comfort": number,
-          "ease_of_learning": number,
-        }},
-      }},
-      "objective_metrics": {{
-        "cognitive_load_psd": number,
-        "fall_risk_pressure": number,
-        "muscle_activity": number,
-        "range_of_motion": number,
-        "exertion_ppg_eda": number,
-      }},
-      "facilitators": {{
-        "physical_exertion_reduction": number,
-        "light_cognitive_load": number,
-        "stability": number,
-        "compatibility": number,
-        "comfort": number,
-        "productivity": number,
-        "usability": number,
-      }},
-      "barriers": {{
-        "overexertion": number,
-        "psychological_risk": number,
-        "increased_fall_risk": number,
-        "incompatibility": number,
-        "discomfort": number,
-        "usability_concern": number,
-      }},
-      "criteria_weights": {{
-        "physical_exertion_reduction": number,
-        "light_cognitive_load": number,
-        "stability": number,
-        "compatibility": number,
-        "comfort": number,
-        "productivity": number,
-        "usability": number,
-        "overexertion": number,
-        "psychological_risk": number,
-        "increased_fall_risk": number,
-        "incompatibility": number,
-        "discomfort": number,
-        "usability_concern": number,
-      }},
-      "netscore": number,
-      "report_markdown": string,
-    }}
+      Add analysis highlights and recommendations.
     
     Input:
     {input}
