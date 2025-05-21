@@ -55,7 +55,7 @@ export const REPORT_TEMPLATE = `
        Criterion | Facilitator (Fi) | Barrier (Bi) | Weight
        One row per criterion.
 
-      Next, Prepare A short note explaining the analysis from the subjective analysis results to the Unified NetScore of Benefit-Risk analysis and identifying the top facilitator and top barrier.
+      Next, Prepare A short note explaining the analysis from the subjective analysis results to the Unified NetScore of Benefit-Risk analysis and identifying the top facilitator and top barrier. And Ensure to rand up any decimals to 2 decimal digits.
 
       Add analysis highlights and recommendations.
     

@@ -28,7 +28,7 @@ reportGenerationQueue.process(async (job) => {
     // Generate the report
     const reportData = await generateReport(inputData)
 
-    console.log('Report data:', reportData)
+    // console.log('Report data:', reportData)
 
     // Generate PDF
     const pdfPath = await generatePDF(reportData, reportId)
