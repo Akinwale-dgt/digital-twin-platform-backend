@@ -6,7 +6,7 @@ import {
   createCognitiveWorkload,
   processCognitiveWorkloadData,
 } from '../service/cognitiveWorkload.js'
-import { createDiscomfort } from '../service/discomfort.js'
+import { createDiscomfort, getDiscomfort } from '../service/discomfort.js'
 import { createExertion, processExertionData } from '../service/exertion.js'
 import { createSituationalAwareness } from '../service/situationAwareness.js'
 import processFallRiskData from '../service/fallRisk.js'
@@ -15,7 +15,10 @@ import { createUsability } from '../service/usability.js'
 
 export const createDiscomfortController = async (req, res, next) => {
   try {
-    await createDiscomfort(req.body)
+    await createDiscomfort({
+      sessionID: req.sessionID,
+      ...req.body
+    })
 
     return res.status(200).send({
       status: 'success',
@@ -26,9 +29,29 @@ export const createDiscomfortController = async (req, res, next) => {
   }
 }
 
+export const getDiscomfortController = async (req, res, next) => {
+  try {
+   const discomfort = await getDiscomfort({
+      sessionID: req.sessionID,
+      exoID: req.params.id
+    })
+
+    return res.status(200).send({
+      status: 'success',
+      message: 'Discomfort recorded',
+      data: discomfort
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
 export const createCognitiveWorkloadController = async (req, res, next) => {
   try {
-    await createCognitiveWorkload(req.body)
+    await createCognitiveWorkload({
+      sessionID: req.sessionID,
+      ...req.body
+    })
 
     return res.status(200).send({
       status: 'success',
@@ -41,7 +64,10 @@ export const createCognitiveWorkloadController = async (req, res, next) => {
 
 export const createExertionController = async (req, res, next) => {
   try {
-    await createExertion(req.body)
+    await createExertion({
+      sessionID: req.sessionID,
+      ...req.body
+    })
 
     return res.status(200).send({
       status: 'success',
@@ -54,7 +80,10 @@ export const createExertionController = async (req, res, next) => {
 
 export const createBalanceController = async (req, res, next) => {
   try {
-    await createBalance(req.body)
+    await createBalance({
+      sessionID: req.sessionID,
+      ...req.body
+    })
 
     return res.status(200).send({
       status: 'success',
@@ -67,7 +96,10 @@ export const createBalanceController = async (req, res, next) => {
 
 export const createSituationalAwarenessController = async (req, res, next) => {
   try {
-    await createSituationalAwareness(req.body)
+    await createSituationalAwareness({
+      sessionID: req.sessionID,
+      ...req.body
+    })
 
     return res.status(200).send({
       status: 'success',
@@ -80,7 +112,11 @@ export const createSituationalAwarenessController = async (req, res, next) => {
 
 export const createUsabilityController = async (req, res, next) => {
   try {
-    await createUsability(req.body)
+
+    await createUsability({
+      sessionID: req.sessionID,
+      ...req.body
+    })
 
     return res.status(200).send({
       status: 'success',

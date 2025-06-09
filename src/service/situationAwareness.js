@@ -2,7 +2,22 @@ import SituationalAwareness from '../models/situationalAwareness.js'
 import logger from '../utils/customLogger.js'
 
 export const createSituationalAwareness = async (data) => {
-  const situationalAwareness = await SituationalAwareness.create(data)
+  const { sessionID, exoID, ...rest } = data;
+
+  if (!sessionID) {
+    throw new Error('sessionId is required');
+  }
+
+
+  const situationalAwareness = await SituationalAwareness.findOneAndUpdate(
+    { sessionID, exoID },
+    { $set: { ...rest, exoID, sessionID } }, 
+    {
+      new: true,
+      upsert: true,
+      setDefaultsOnInsert: true,
+    }
+  );
 
   return situationalAwareness
 }

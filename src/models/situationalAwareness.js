@@ -57,6 +57,13 @@ const SituationalAwarenessSchema = new Schema(
       enum: SituationalAwarenessEnum,
       required: true,
     },
+    exoID: {
+      type: Number
+    },
+    sessionID: {
+      type: String,
+      required: true
+    }
   },
   { timestamps: true },
 )

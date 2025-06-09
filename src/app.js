@@ -4,6 +4,7 @@ import helmet from 'helmet'
 import mongoSanitize from 'express-mongo-sanitize'
 import hpp from 'hpp'
 import compression from 'compression'
+import session from 'express-session'
 
 import routes from './routes/index.js'
 import { globalErrorHandler, unhandledRoutes } from './middleware/error.js'
@@ -12,7 +13,10 @@ import { globalErrorHandler, unhandledRoutes } from './middleware/error.js'
 const app = express()
 
 /* Enable CORS */
-app.use(cors())
+app.use(cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true
+  }));
 app.options('*', cors())
 
 /* Parse the request body */
@@ -30,6 +34,20 @@ app.use(hpp())
 
 /* Compress response body */
 app.use(compression())
+
+/* use Session for unique browser experience */
+app.use(
+    session({
+      secret: 'digital-twin',
+      resave: false,
+      saveUninitialized: true,
+      cookie: { 
+        maxAge: 24 * 60 * 60 * 3000,
+        secure: false,
+        sameSite: 'lax',
+     },
+    })
+  );
 
 /* Mount routers */
 app.get('/api', (req, res) => res.status(200).send('Server is up and running!!!'))

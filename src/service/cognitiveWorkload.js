@@ -4,7 +4,21 @@ import CognitiveWorkload from '../models/cognitiveWorkload.js'
 import logger from '../utils/customLogger.js'
 
 export const createCognitiveWorkload = async (data) => {
-  const cognitiveWorkload = await CognitiveWorkload.create(data)
+  const { sessionID, exoID, ...rest } = data;
+
+  if (!sessionID) {
+    throw new Error('sessionId is required');
+  }
+
+  const cognitiveWorkload = await CognitiveWorkload.findOneAndUpdate(
+    { sessionID, exoID },
+    { $set: { ...rest, sessionID, exoID } }, 
+    {
+      new: true,
+      upsert: true,
+      setDefaultsOnInsert: true,
+    }
+  );
 
   return cognitiveWorkload
 }

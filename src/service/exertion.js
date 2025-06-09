@@ -4,7 +4,21 @@ import Exertion from '../models/exertion.js'
 import logger from '../utils/customLogger.js'
 
 export const createExertion = async (data) => {
-  const exertion = await Exertion.create(data)
+  const { sessionID, exoID, ...rest } = data;
+
+  if (!sessionID) {
+    throw new Error('sessionId is required');
+  }
+  
+  const exertion = await Exertion.findOneAndUpdate(
+    { sessionID, exoID },
+    { $set: { ...rest, sessionID, exoID } }, 
+    {
+      new: true,
+      upsert: true,
+      setDefaultsOnInsert: true,
+    }
+  );
 
   return exertion
 }

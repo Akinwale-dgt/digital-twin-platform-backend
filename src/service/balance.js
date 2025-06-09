@@ -2,7 +2,21 @@ import Balance from '../models/balance.js'
 import logger from '../utils/customLogger.js'
 
 export const createBalance = async (data) => {
-  const balance = await Balance.create(data)
+  const { sessionID, exoID, ...rest } = data;
+
+  if (!sessionID) {
+    throw new Error('sessionId is required');
+  }
+
+  const balance = await Balance.findOneAndUpdate(
+    { sessionID, exoID },
+    { $set: { ...rest, exoID, sessionID } }, 
+    {
+      new: true,
+      upsert: true,
+      setDefaultsOnInsert: true,
+    }
+  );
 
   return balance
 }

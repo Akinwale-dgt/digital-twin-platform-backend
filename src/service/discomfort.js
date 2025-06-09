@@ -2,10 +2,38 @@ import Discomfort from '../models/discomfort.js'
 import logger from '../utils/customLogger.js'
 
 export const createDiscomfort = async (data) => {
-  const discomfort = await Discomfort.create(data)
+  const { sessionID, exoID, ...rest } = data;
+  
+  if (!sessionID) {
+    throw new Error('sessionId is required');
+  }
 
-  return discomfort
-}
+  const discomfort = await Discomfort.findOneAndUpdate(
+    { sessionID, exoID },
+    { $set: { ...rest, sessionID, exoID } }, 
+    {
+      new: true,
+      upsert: true,
+      setDefaultsOnInsert: true,
+    }
+  );
+
+  return discomfort;
+};
+
+export const getDiscomfort = async (data) => {
+  const { sessionID, exoID } = data;
+
+  if (!sessionID) {
+    throw new Error('sessionId is required');
+  }
+
+  const discomfort = await Discomfort.findOne(
+    { sessionID, exoID}
+  );
+
+  return discomfort;
+};
 
 export const averageDiscomfort = async () => {
   try {
