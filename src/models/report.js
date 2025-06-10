@@ -12,7 +12,7 @@ const ReportSchema = new Schema(
       default: 'pending',
     },
     inputData: {
-      type: Object,
+      type: [Object],
       required: true,
     },
     results: {

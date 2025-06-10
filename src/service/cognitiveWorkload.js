@@ -23,9 +23,12 @@ export const createCognitiveWorkload = async (data) => {
   return cognitiveWorkload
 }
 
-export const averageCognitiveWorkload = async () => {
+export const averageCognitiveWorkload = async (exoID) => {
   try {
     const result = await CognitiveWorkload.aggregate([
+      {
+        $match: { exoID: exoID },
+      },
       {
         $addFields: {
           total: {
@@ -42,7 +45,8 @@ export const averageCognitiveWorkload = async () => {
       },
       {
         $group: {
-          _id: null,
+          _id: '$exoID',
+          exoID: { $first: '$exoID' },
           overallAverage: { $avg: '$total' },
         },
       },
@@ -55,12 +59,16 @@ export const averageCognitiveWorkload = async () => {
   }
 }
 
-export const averageCognitiveWorkloadByField = async () => {
+export const averageCognitiveWorkloadByField = async (exoID) => {
   try {
     const result = await CognitiveWorkload.aggregate([
       {
+        $match: { exoID: exoID },
+      },
+      {
         $group: {
-          _id: null,
+          _id: '$exoID',
+          exoID: { $first: '$exoID' },
           avgMentalDemand: { $avg: '$mental_demand' },
           avgPhysicalDemand: { $avg: '$physical_demand' },
           avgTemporalDemand: { $avg: '$temporal_demand' },
@@ -72,6 +80,7 @@ export const averageCognitiveWorkloadByField = async () => {
       {
         $project: {
           _id: 0,
+          exoID: 1,
           avgMentalDemand: 1,
           avgPhysicalDemand: 1,
           avgTemporalDemand: 1,

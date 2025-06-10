@@ -6,12 +6,12 @@ import {
   createCognitiveWorkload,
   processCognitiveWorkloadData,
 } from '../service/cognitiveWorkload.js'
-import { createDiscomfort, getDiscomfort } from '../service/discomfort.js'
+import { createDiscomfort } from '../service/discomfort.js'
 import { createExertion, processExertionData } from '../service/exertion.js'
 import { createSituationalAwareness } from '../service/situationAwareness.js'
 import processFallRiskData from '../service/fallRisk.js'
 import { Measure } from '../shared/constants.js'
-import { createUsability } from '../service/usability.js'
+import { createUsability, getUsability } from '../service/usability.js'
 
 export const createDiscomfortController = async (req, res, next) => {
   try {
@@ -23,23 +23,6 @@ export const createDiscomfortController = async (req, res, next) => {
     return res.status(200).send({
       status: 'success',
       message: 'Discomfort recorded',
-    })
-  } catch (error) {
-    next(error)
-  }
-}
-
-export const getDiscomfortController = async (req, res, next) => {
-  try {
-   const discomfort = await getDiscomfort({
-      sessionID: req.sessionID,
-      exoID: req.params.id
-    })
-
-    return res.status(200).send({
-      status: 'success',
-      message: 'Discomfort recorded',
-      data: discomfort
     })
   } catch (error) {
     next(error)
@@ -126,6 +109,24 @@ export const createUsabilityController = async (req, res, next) => {
     next(error)
   }
 }
+
+export const getUsabilityController = async (req, res, next) => {
+  try {
+   const usablity = await getUsability({
+      sessionID: req.sessionID,
+      exoID: req.params.id
+    })
+
+    return res.status(200).send({
+      status: 'success',
+      message: 'usablity fetched successfully',
+      data: usablity
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
 
 export const uploadFileController = async (req, res, next) => {
   try {

@@ -23,12 +23,16 @@ export const createExertion = async (data) => {
   return exertion
 }
 
-export const averageExertion = async () => {
+export const averageExertion = async (exoID) => {
   try {
     const result = await Exertion.aggregate([
       {
+        $match: { exoID: exoID },
+      },
+      {
         $group: {
-          _id: null,
+          _id: '$exoID', // group by exoID
+          exoID: { $first: '$exoID' }, // include exoID in the result
           averageRateOfExertion: { $avg: '$rate_of_exertion' },
         },
       },

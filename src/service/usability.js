@@ -22,6 +22,21 @@ export const createUsability = async (data) => {
   return usability
 }
 
+export const getUsability = async (data) => {
+  const { sessionID, exoID } = data;
+
+  if (!sessionID) {
+    throw new Error('sessionId is required');
+  }
+
+  const discomfort = await Usability.findOne(
+    { sessionID, exoID}
+  );
+
+  return discomfort;
+};
+
+
 export const averageUsability = async () => {
   try {
     const result = await Usability.aggregate([

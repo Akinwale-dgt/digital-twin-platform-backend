@@ -3,7 +3,7 @@ import logger from '../utils/customLogger.js'
 
 export const createDiscomfort = async (data) => {
   const { sessionID, exoID, ...rest } = data;
-  
+
   if (!sessionID) {
     throw new Error('sessionId is required');
   }
@@ -21,23 +21,14 @@ export const createDiscomfort = async (data) => {
   return discomfort;
 };
 
-export const getDiscomfort = async (data) => {
-  const { sessionID, exoID } = data;
 
-  if (!sessionID) {
-    throw new Error('sessionId is required');
-  }
+export const averageDiscomfort = async (exoID) => {
 
-  const discomfort = await Discomfort.findOne(
-    { sessionID, exoID}
-  );
-
-  return discomfort;
-};
-
-export const averageDiscomfort = async () => {
   try {
     const result = await Discomfort.aggregate([
+      {
+        $match: { exoID: exoID },
+      },
       {
         $addFields: {
           total: {
@@ -55,7 +46,8 @@ export const averageDiscomfort = async () => {
       },
       {
         $group: {
-          _id: null,
+          _id: '$exoID',
+          exoID: { $first: '$exoID' },
           overallAverage: { $avg: '$total' },
         },
       },
@@ -68,12 +60,16 @@ export const averageDiscomfort = async () => {
   }
 }
 
-export const averageDiscomfortByField = async () => {
+export const averageDiscomfortByField = async (exoID) => {
   try {
     const result = await Discomfort.aggregate([
       {
+        $match: { exoID: exoID },
+      },
+      {
         $group: {
-          _id: null,
+          _id: '$exoID',
+          exoID: { $first: '$exoID' },
           avgHandAndWaist: { $avg: '$hand_and_waist' },
           avgUpperArm: { $avg: '$upper_arm' },
           avgShoulder: { $avg: '$shoulder' },
@@ -86,13 +82,14 @@ export const averageDiscomfortByField = async () => {
       {
         $project: {
           _id: 0,
-          avgHandAndWaist: '$avgHandAndWaist',
-          avgUpperArm: '$avgUpperArm',
-          avgShoulder: '$avgShoulder',
-          avgLowerBack: '$avgLowerBack',
-          avgThigh: '$avgThigh',
-          avgNeck: '$avgNeck',
-          avgLowerLegAndFoot: '$avgLowerLegAndFoot',
+          exoID: 1,
+          avgHandAndWaist: 1,
+          avgUpperArm: 1,
+          avgShoulder: 1,
+          avgLowerBack: 1,
+          avgThigh: 1,
+          avgNeck: 1,
+          avgLowerLegAndFoot: 1,
         },
       },
     ])

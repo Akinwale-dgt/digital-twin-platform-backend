@@ -7,7 +7,7 @@ import {
   createSituationalAwarenessController,
   uploadFileController,
   createUsabilityController,
-  getDiscomfortController,
+  getUsabilityController,
 } from '../controllers/inputData.js'
 import { analyzeSubjectiveData } from '../controllers/analyzeData.js'
 import validateCreateDiscomfortRoute from '../validators/discomfort.js'
@@ -58,7 +58,7 @@ router.post(
   createUsabilityController,
 )
 
-router.get('/discomfort/:id', getDiscomfortController)
+router.get('/usability/:id', getUsabilityController)
 
 router.get('/analyze-subjective-data', analyzeSubjectiveData)
 

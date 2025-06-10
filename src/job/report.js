@@ -5,6 +5,7 @@ import Report from '../models/report.js'
 import generateReport from '../service/report.js'
 // import generatePDF from '../utils/generatePdfV3.js'
 import logger from '../utils/customLogger.js'
+import { buildReadableTable, calculateCriterionSums, calculateDivergence, calculateEntropyComponents, calculateFinalScores, calculateTotalEntropy, calculateWeights, normalizeTransformedData, serialiseLLMResult } from '../service/calculations.js'
 
 // Get the directory name equivalent for ES modules
 // const __filename = fileURLToPath(import.meta.url)
@@ -26,7 +27,42 @@ reportGenerationQueue.process(async (job) => {
     await Report.findByIdAndUpdate(reportId, { status: 'processing' })
 
     // Generate the report
-    const reportData = await generateReport(inputData)
+    // const reportData = await generateReport(inputData)
+
+
+
+    const llmResult = serialiseLLMResult(inputData)
+
+
+    console.log('LLM Result --> ', llmResult)
+
+
+    const calculatedCriterion = calculateCriterionSums(llmResult.transformedData)
+
+    console.log('Calculated Criterion --> ', calculatedCriterion)
+
+    const normalizationCompletion = normalizeTransformedData(llmResult.transformedData, calculatedCriterion)
+
+    console.log('Normalized Result --> ', normalizationCompletion)
+
+    const entropyComponents = calculateEntropyComponents(normalizationCompletion)
+    console.log('Entropy Result --> ', entropyComponents)
+
+    // Step 4: Total entropy per criterion
+    const totalEntropy = calculateTotalEntropy(entropyComponents)
+    console.log('Total Entropy --> ', totalEntropy)
+
+    const calculatedDivergence = calculateDivergence(totalEntropy)
+    console.log('Total Divergence --> ', calculatedDivergence)
+
+    const calculatedWeight = calculateWeights(calculatedDivergence)
+    console.log('Calculated Weight --> ', calculatedWeight)
+
+    const finalScore = calculateFinalScores(normalizationCompletion, calculatedWeight)
+    console.log('Final Scores -->', finalScore)
+
+    const readableTable = buildReadableTable(normalizationCompletion, calculatedWeight)
+    console.log('Readable Table -->', readableTable)
 
     // console.log('Report data:', reportData)
 
@@ -39,7 +75,7 @@ reportGenerationQueue.process(async (job) => {
     // Update the report in the database
     await Report.findByIdAndUpdate(reportId, {
       status: 'completed',
-      results: { report_markdown: reportData.content, id: reportData.id },
+      // results: { report_markdown: reportData.content, id: reportData.id },
       // pdfPath: relativePdfPath,
     })
 

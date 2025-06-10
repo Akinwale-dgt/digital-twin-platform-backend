@@ -91,6 +91,7 @@ export const inputParser = (inputData) => {
     totalAverageDiscomfortByField,
     totalAverageCognitiveWorkloadByField,
     totalAverageSituationalAwarenessByField,
+    exoID
   } = JSON.parse(inputData)
 
   const totalAveragePercentDiscomfort = (totalAverageDiscomfort / 70) * 100
@@ -149,6 +150,7 @@ export const inputParser = (inputData) => {
     exertion: totalAverageExertion,
     balance: totalAverageBalance,
     weightedSumRating,
+    exoID: exoID
   }
 }
 

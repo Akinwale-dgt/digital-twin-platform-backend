@@ -21,12 +21,16 @@ export const createBalance = async (data) => {
   return balance
 }
 
-export const averageBalance = async () => {
+export const averageBalance = async (exoID) => {
   try {
     const result = await Balance.aggregate([
       {
+        $match: { exoID: exoID },
+      },
+      {
         $group: {
-          _id: null,
+          _id: '$exoID', // group by exoID
+          exoID: { $first: '$exoID' }, // include exoID in the result
           averageRateOfBalance: { $avg: '$rate_of_balance' },
         },
       },
