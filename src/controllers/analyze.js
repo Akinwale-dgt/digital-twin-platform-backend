@@ -67,7 +67,7 @@ const analyzeDataController = async (req, res, next) => {
       message: 'Subjective data analyzed successfully',
       data: {
         data: "Please refactor based on data you want to pass to frontend",
-        // report: { reportId: report._id, status: report.status },
+        report: { reportId: report._id, status: report.status },
         digital_twin: digitalTwin,
       },
     })

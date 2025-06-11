@@ -27,7 +27,7 @@ reportGenerationQueue.process(async (job) => {
     // Update report status to processing
     await Report.findByIdAndUpdate(reportId, { status: 'processing' })
 
-    // Generate the report
+    // Inferred analysis data
     const inferredAnalysisData = await inferredAnalysis(inputData)
     console.log('Report Analysis Data --> ', inferredAnalysisData)
 
@@ -64,6 +64,9 @@ reportGenerationQueue.process(async (job) => {
     const readableTable = buildReadableTable(normalizationCompletion, calculatedWeight)
     console.log('Readable Table -->', readableTable)
 
+    // Generate the report
+    // const reportAnalysisData = await generateReport(inputData)
+    // console.log('Report Analysis Data --> ', reportAnalysisData)
     // console.log('Report data:', reportData)
 
     // Generate PDF
