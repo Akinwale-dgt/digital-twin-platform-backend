@@ -15,6 +15,10 @@ const ReportSchema = new Schema(
       type: [Object],
       required: true,
     },
+    inferredAnalysis: {
+      type: [Object],
+      default: null,
+    },
     results: {
       type: Object,
       default: null,

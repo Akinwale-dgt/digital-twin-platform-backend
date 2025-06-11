@@ -4,6 +4,7 @@ import helmet from 'helmet'
 import mongoSanitize from 'express-mongo-sanitize'
 import hpp from 'hpp'
 import compression from 'compression'
+// eslint-disable-next-line import/no-extraneous-dependencies
 import session from 'express-session'
 
 import routes from './routes/index.js'

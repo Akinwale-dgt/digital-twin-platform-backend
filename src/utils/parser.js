@@ -150,7 +150,7 @@ export const inputParser = (inputData) => {
     exertion: totalAverageExertion,
     balance: totalAverageBalance,
     weightedSumRating,
-    exoID: exoID
+    exoID
   }
 }
 

@@ -62,10 +62,73 @@ export const REPORT_TEMPLATE = `
     Input:
     {input}
 `
+export const INFERRED_OBJ_TEMPLATE = `
+    You are a decision-support analyst.
+
+    Process:
+
+    1. Normalize Subjective Inputs (0–1)
+       • TLX items: divide each 0–20 value by 20  
+       • Discomfort: divide each 0–10 value by 10  
+       • Exertion: map 6–20 → (value – 6) / 14  
+       • Balance: divide each 0–10 value by 10  
+       • Usability: map 1–5 → (value – 1) / 4  
+       • Situational Awareness: map 1–7 → (value – 1) / 6  
+
+       Save results as "subjective_norm".
+
+    2. Infer & Normalize Objective Metrics (0–1) from subjective_norm:
+       – cognitive_load_psd  from TLX
+       – fall_risk_pressure  from Balance
+       – muscle_activity_EMG from Discomfort 
+       – range_of_motion_IMU From Discomfort & Usability
+       – exertion_ppg_eda    from exertion
+
+       Save results as "objective_metrics".
+
+    3. Compute Facilitator Vector Fi:
+       physical_exertion_reduction = 1 – muscle_activity  
+       light_cognitive_load        = 1 – cognitive_load_psd  
+       stability                   = 1 – fall_risk_pressure  
+       compatibility               = range_of_motion  
+       comfort                     = 1 – mean(subjective_norm.discomfort.*)  
+       productivity                = subjective_norm.cognitive_load.performance  
+       usability                   = mean(subjective_norm.usability.*)  
+
+    ---
+    Return ONLY a valid JSON object with the following top-level keys:
+
+        - [{{
+                "exoID": string, // Optional exoskeleton ID
+              "objective_metrics": {{
+                    "cognitive_load_psd": number,
+                    "fall_risk_pressure": number,
+                    "muscle_activity": number,
+                    "range_of_motion": number,
+                    "exertion_ppg_eda": number,
+                }},
+
+                "facilitators": {{
+                  "physical_exertion_reduction": number,
+                  "light_cognitive_load": number,
+                  "stability": number,
+                  "compatibility": number,
+                  "comfort": number,
+                  "productivity": number,
+                  "usability": number,
+                }},
+            }}]
+    
+    DO NOT return any text or explanation outside this JSON.
+    DO NOT use null values - always provide valid numbers and categories.
+
+    Input:
+    {input}
+`
 
 export const DIGITAL_TWIN_TEMPLATE = `
     You are a data-analysis assistant. 
-    Classify each metric below based on the following rules:
+    Classify each metric below based on the following rules, the data is provided in the input which is an array of objects for each exoskeleton.:
 
     1. **Cognitive Load**  
         - Category for each construct (range 0–20):  
@@ -96,7 +159,9 @@ export const DIGITAL_TWIN_TEMPLATE = `
     ---
 
     Return ONLY a valid JSON object with the following top-level keys:
-    - "cognitive_load": {{
+    - [{{
+        "exoID": string, // Optional exoskeleton ID
+      "cognitive_load": {{
         "raw_scores": {{
             "mental_demand": number,
             "physical_demand": number,
@@ -116,7 +181,7 @@ export const DIGITAL_TWIN_TEMPLATE = `
         "overall_score": number,
         "overall_category": "Low" | "Medium" | "High"
         }}
-    - "discomfort": {{
+      "discomfort": {{
         "raw_scores": {{
             "hand_wrist": number,
             "upper_arm": number,
@@ -136,14 +201,15 @@ export const DIGITAL_TWIN_TEMPLATE = `
             "lower_leg_foot": "Low" | "Medium" | "High"
         }}
         }}
-    - "exertion": {{
+      "exertion": {{
         "raw_scores": number,
         "categories": "Low" | "Medium" | "High"
         }}
-    - "balance": {{
+      "balance": {{
         "raw_scores": number,
         "categories": "Low" | "Medium" | "High"
         }}
+    }}]
     
     DO NOT return any text or explanation outside this JSON.
     DO NOT use null values - always provide valid numbers and categories.

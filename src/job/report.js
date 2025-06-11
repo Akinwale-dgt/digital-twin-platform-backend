@@ -2,7 +2,8 @@ import Bull from 'bull'
 // import path from 'path'
 // import { fileURLToPath } from 'url'
 import Report from '../models/report.js'
-import generateReport from '../service/report.js'
+// import generateReport from '../service/report.js'
+import inferredAnalysis from '../service/inferredAnalysis.js'
 // import generatePDF from '../utils/generatePdfV3.js'
 import logger from '../utils/customLogger.js'
 import { buildReadableTable, calculateCriterionSums, calculateDivergence, calculateEntropyComponents, calculateFinalScores, calculateTotalEntropy, calculateWeights, normalizeTransformedData, serialiseLLMResult } from '../service/calculations.js'
@@ -27,11 +28,10 @@ reportGenerationQueue.process(async (job) => {
     await Report.findByIdAndUpdate(reportId, { status: 'processing' })
 
     // Generate the report
-    // const reportData = await generateReport(inputData)
+    const inferredAnalysisData = await inferredAnalysis(inputData)
+    console.log('Report Analysis Data --> ', inferredAnalysisData)
 
-
-
-    const llmResult = serialiseLLMResult(inputData)
+    const llmResult = serialiseLLMResult(inferredAnalysisData)
 
 
     console.log('LLM Result --> ', llmResult)
@@ -75,6 +75,7 @@ reportGenerationQueue.process(async (job) => {
     // Update the report in the database
     await Report.findByIdAndUpdate(reportId, {
       status: 'completed',
+      inferredAnalysis: inferredAnalysisData,
       // results: { report_markdown: reportData.content, id: reportData.id },
       // pdfPath: relativePdfPath,
     })
