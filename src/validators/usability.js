@@ -99,10 +99,14 @@ const validateCreateUsabilityRoute = () => {
       .isInt()
       .withMessage('This field must be an integer'),
 
+    body('exoID')
+      .exists()
+      .withMessage('ExoID is required')
+      .isInt()
+      .withMessage('ExoID must be an integer'),
+
     (req, res, next) => {
       const errors = validationResult(req)
-
-      console.log('Errors:', errors);
 
       if (!errors.isEmpty()) {
         return next(errors.array())

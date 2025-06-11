@@ -39,6 +39,12 @@ const validateCreateCognitiveWorkloadRoute = () => {
       .isInt()
       .withMessage('Frustration must be an integer'),
 
+    body('exoID')
+      .exists()
+      .withMessage('ExoID is required')
+      .isInt()
+      .withMessage('ExoID must be an integer'),
+
     (req, res, next) => {
       const errors = validationResult(req)
 

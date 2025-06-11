@@ -11,11 +11,14 @@ import { createExertion, processExertionData } from '../service/exertion.js'
 import { createSituationalAwareness } from '../service/situationAwareness.js'
 import processFallRiskData from '../service/fallRisk.js'
 import { Measure } from '../shared/constants.js'
-import { createUsability } from '../service/usability.js'
+import { createUsability, getUsability } from '../service/usability.js'
 
 export const createDiscomfortController = async (req, res, next) => {
   try {
-    await createDiscomfort(req.body)
+    await createDiscomfort({
+      sessionID: req.sessionID,
+      ...req.body
+    })
 
     return res.status(200).send({
       status: 'success',
@@ -28,7 +31,10 @@ export const createDiscomfortController = async (req, res, next) => {
 
 export const createCognitiveWorkloadController = async (req, res, next) => {
   try {
-    await createCognitiveWorkload(req.body)
+    await createCognitiveWorkload({
+      sessionID: req.sessionID,
+      ...req.body
+    })
 
     return res.status(200).send({
       status: 'success',
@@ -41,7 +47,10 @@ export const createCognitiveWorkloadController = async (req, res, next) => {
 
 export const createExertionController = async (req, res, next) => {
   try {
-    await createExertion(req.body)
+    await createExertion({
+      sessionID: req.sessionID,
+      ...req.body
+    })
 
     return res.status(200).send({
       status: 'success',
@@ -54,7 +63,10 @@ export const createExertionController = async (req, res, next) => {
 
 export const createBalanceController = async (req, res, next) => {
   try {
-    await createBalance(req.body)
+    await createBalance({
+      sessionID: req.sessionID,
+      ...req.body
+    })
 
     return res.status(200).send({
       status: 'success',
@@ -67,7 +79,10 @@ export const createBalanceController = async (req, res, next) => {
 
 export const createSituationalAwarenessController = async (req, res, next) => {
   try {
-    await createSituationalAwareness(req.body)
+    await createSituationalAwareness({
+      sessionID: req.sessionID,
+      ...req.body
+    })
 
     return res.status(200).send({
       status: 'success',
@@ -80,7 +95,11 @@ export const createSituationalAwarenessController = async (req, res, next) => {
 
 export const createUsabilityController = async (req, res, next) => {
   try {
-    await createUsability(req.body)
+
+    await createUsability({
+      sessionID: req.sessionID,
+      ...req.body
+    })
 
     return res.status(200).send({
       status: 'success',
@@ -90,6 +109,24 @@ export const createUsabilityController = async (req, res, next) => {
     next(error)
   }
 }
+
+export const getUsabilityController = async (req, res, next) => {
+  try {
+   const usablity = await getUsability({
+      sessionID: req.sessionID,
+      exoID: req.params.id
+    })
+
+    return res.status(200).send({
+      status: 'success',
+      message: 'usablity fetched successfully',
+      data: usablity
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
 
 export const uploadFileController = async (req, res, next) => {
   try {

@@ -2,17 +2,35 @@ import Balance from '../models/balance.js'
 import logger from '../utils/customLogger.js'
 
 export const createBalance = async (data) => {
-  const balance = await Balance.create(data)
+  const { sessionID, exoID, ...rest } = data;
+
+  if (!sessionID) {
+    throw new Error('sessionId is required');
+  }
+
+  const balance = await Balance.findOneAndUpdate(
+    { sessionID, exoID },
+    { $set: { ...rest, exoID, sessionID } }, 
+    {
+      new: true,
+      upsert: true,
+      setDefaultsOnInsert: true,
+    }
+  );
 
   return balance
 }
 
-export const averageBalance = async () => {
+export const averageBalance = async (exoID) => {
   try {
     const result = await Balance.aggregate([
       {
+        $match: { exoID: exoID },
+      },
+      {
         $group: {
-          _id: null,
+          _id: '$exoID', // group by exoID
+          exoID: { $first: '$exoID' }, // include exoID in the result
           averageRateOfBalance: { $avg: '$rate_of_balance' },
         },
       },

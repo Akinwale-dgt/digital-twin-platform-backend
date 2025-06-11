@@ -7,6 +7,7 @@ import {
   createSituationalAwarenessController,
   uploadFileController,
   createUsabilityController,
+  getUsabilityController,
 } from '../controllers/inputData.js'
 import { analyzeSubjectiveData } from '../controllers/analyzeData.js'
 import validateCreateDiscomfortRoute from '../validators/discomfort.js'
@@ -22,6 +23,20 @@ import validateCreateUsabilityRoute from '../validators/usability.js'
 
 
 const router = express.Router()
+
+router.get('/session-check', (req, res) => {   
+  if (!req.session.visited) {
+    req.session.visited = true;
+    req.session.views = 1;
+    res.json({ 
+      message: 'First time visitor',
+      sessionID: req.sessionID
+     });
+  } else {
+    req.session.views += 1;
+    res.json({ message: 'Welcome back!', views: req.session.views });
+  }
+});
 
 router.post('/discomfort', validateCreateDiscomfortRoute(), createDiscomfortController)
 router.post('/exertion', validateCreateExertionRoute(), createExertionController)
@@ -42,6 +57,9 @@ router.post(
   validateCreateUsabilityRoute(),
   createUsabilityController,
 )
+
+router.get('/usability/:id', getUsabilityController)
+
 router.get('/analyze-subjective-data', analyzeSubjectiveData)
 
 // router.post('/analyze-data', analyzeDataController)

@@ -12,8 +12,12 @@ const ReportSchema = new Schema(
       default: 'pending',
     },
     inputData: {
-      type: Object,
+      type: [Object],
       required: true,
+    },
+    inferredAnalysis: {
+      type: [Object],
+      default: null,
     },
     results: {
       type: Object,

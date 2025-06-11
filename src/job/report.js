@@ -3,8 +3,10 @@ import Bull from 'bull'
 // import { fileURLToPath } from 'url'
 import Report from '../models/report.js'
 import generateReport from '../service/report.js'
+import inferredAnalysis from '../service/inferredAnalysis.js'
 // import generatePDF from '../utils/generatePdfV3.js'
 import logger from '../utils/customLogger.js'
+import { buildReadableTable, calculateCriterionSums, calculateDivergence, calculateEntropyComponents, calculateFinalScores, calculateTotalEntropy, calculateWeights, normalizeTransformedData, serialiseLLMResult } from '../service/calculations.js'
 
 // Get the directory name equivalent for ES modules
 // const __filename = fileURLToPath(import.meta.url)
@@ -25,10 +27,30 @@ reportGenerationQueue.process(async (job) => {
     // Update report status to processing
     await Report.findByIdAndUpdate(reportId, { status: 'processing' })
 
-    // Generate the report
-    const reportData = await generateReport(inputData)
+    // Inferred analysis data
+    const inferredAnalysisData = await inferredAnalysis(inputData)
 
-    // console.log('Report data:', reportData)
+    const llmResult = serialiseLLMResult(inferredAnalysisData)
+
+
+
+    const calculatedCriterion = calculateCriterionSums(llmResult.transformedData)
+
+    const normalizationCompletion = normalizeTransformedData(llmResult.transformedData, calculatedCriterion)
+
+    const entropyComponents = calculateEntropyComponents(normalizationCompletion)
+    // Step 4: Total entropy per criterion
+    const totalEntropy = calculateTotalEntropy(entropyComponents)
+
+    const calculatedDivergence = calculateDivergence(totalEntropy)
+
+    const calculatedWeight = calculateWeights(calculatedDivergence)
+
+    const finalScore = calculateFinalScores(normalizationCompletion, calculatedWeight)
+
+    const readableTable = buildReadableTable(normalizationCompletion, calculatedWeight)
+    // Generate the report
+    const reportData = await generateReport(readableTable)
 
     // Generate PDF
     // const pdfPath = await generatePDF(reportData, reportId)
@@ -39,6 +61,7 @@ reportGenerationQueue.process(async (job) => {
     // Update the report in the database
     await Report.findByIdAndUpdate(reportId, {
       status: 'completed',
+      inferredAnalysis: inferredAnalysisData,
       results: { report_markdown: reportData.content, id: reportData.id },
       // pdfPath: relativePdfPath,
     })

@@ -4,7 +4,14 @@ import { StructuredOutputParser } from '@langchain/core/output_parsers'
 import { PromptTemplate } from '@langchain/core/prompts'
 import { z } from 'zod'
 import { REPORT_TEMPLATE } from './template.js'
-
+// import {
+//   cognitiveLoad,
+//   discomfort,
+//   exertion,
+//   balance,
+//   situationalAwareness,
+//   usability,
+// } from './validations.js'
 
 /* Load environment variables into Node.js process */
 dotenv.config()
@@ -65,7 +72,21 @@ export const createExoskeletonOutputParser = () => {
       //   usability_concern: z.number(),
       // }),
       // netscore: z.number(),
-      // report_markdown: z.string(),
+      assessments: z.array(
+        z.object({
+          exoID: z.string().optional(), // Optional exoskeleton ID
+          reducedExertion: z.number(),
+          lightCognitiveLoad: z.number(),
+          stability: z.number(),
+          compatibility: z.number(),
+          easeOfUse: z.number(),
+          productivity: z.number(),
+          comfort: z.number(),
+          totalBeforeRounding: z.number(),
+          finalScore: z.number(),
+        }),
+      ),
+      report_markdown: z.string(),
     }),
   )
 }

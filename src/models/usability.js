@@ -109,6 +109,13 @@ const UsabilitySchema = new Schema(
     ease_of_use: EaseOfUseSchema,
     ease_of_learning: EaseOfLearningSchema,
     comfort: ComfortSchema,
+    exoID: {
+      type: Number
+    },
+    sessionID: {
+      type: String,
+      required: true
+    }
   },
   { timestamps: true },
 )

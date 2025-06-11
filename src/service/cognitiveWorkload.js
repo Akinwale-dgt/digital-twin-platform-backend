@@ -4,14 +4,31 @@ import CognitiveWorkload from '../models/cognitiveWorkload.js'
 import logger from '../utils/customLogger.js'
 
 export const createCognitiveWorkload = async (data) => {
-  const cognitiveWorkload = await CognitiveWorkload.create(data)
+  const { sessionID, exoID, ...rest } = data;
+
+  if (!sessionID) {
+    throw new Error('sessionId is required');
+  }
+
+  const cognitiveWorkload = await CognitiveWorkload.findOneAndUpdate(
+    { sessionID, exoID },
+    { $set: { ...rest, sessionID, exoID } }, 
+    {
+      new: true,
+      upsert: true,
+      setDefaultsOnInsert: true,
+    }
+  );
 
   return cognitiveWorkload
 }
 
-export const averageCognitiveWorkload = async () => {
+export const averageCognitiveWorkload = async (exoID) => {
   try {
     const result = await CognitiveWorkload.aggregate([
+      {
+        $match: { exoID: exoID },
+      },
       {
         $addFields: {
           total: {
@@ -28,7 +45,8 @@ export const averageCognitiveWorkload = async () => {
       },
       {
         $group: {
-          _id: null,
+          _id: '$exoID',
+          exoID: { $first: '$exoID' },
           overallAverage: { $avg: '$total' },
         },
       },
@@ -41,12 +59,16 @@ export const averageCognitiveWorkload = async () => {
   }
 }
 
-export const averageCognitiveWorkloadByField = async () => {
+export const averageCognitiveWorkloadByField = async (exoID) => {
   try {
     const result = await CognitiveWorkload.aggregate([
       {
+        $match: { exoID: exoID },
+      },
+      {
         $group: {
-          _id: null,
+          _id: '$exoID',
+          exoID: { $first: '$exoID' },
           avgMentalDemand: { $avg: '$mental_demand' },
           avgPhysicalDemand: { $avg: '$physical_demand' },
           avgTemporalDemand: { $avg: '$temporal_demand' },
@@ -58,6 +80,7 @@ export const averageCognitiveWorkloadByField = async () => {
       {
         $project: {
           _id: 0,
+          exoID: 1,
           avgMentalDemand: 1,
           avgPhysicalDemand: 1,
           avgTemporalDemand: 1,

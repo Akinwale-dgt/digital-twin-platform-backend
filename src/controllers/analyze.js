@@ -17,39 +17,48 @@ import { inputParser } from '../utils/parser.js'
 
 const analyzeDataController = async (req, res, next) => {
   try {
-    const totalAverageDiscomfort = await averageDiscomfort()
-    const totalAverageSituationalAwareness = await averageSituationalAwareness()
-    const totalAverageExertion = await averageExertion()
-    const totalAverageBalance = await averageBalance()
-    const totalAverageCognitiveWorkload = await averageCognitiveWorkload()
+    const exoIDs = [1, 2, 3]
 
-    const totalAverageDiscomfortByField = await averageDiscomfortByField()
-    const totalAverageCognitiveWorkloadByField = await averageCognitiveWorkloadByField()
-    const totalAverageSituationalAwarenessByField = await averageSituationalAwarenessByField()
+    const results = await Promise.all(
+      exoIDs.map(async (exoID) => {
+        const totalAverageDiscomfort = await averageDiscomfort(exoID)
+        const totalAverageSituationalAwareness = await averageSituationalAwareness(exoID)
+        const totalAverageExertion = await averageExertion(exoID)
+        const totalAverageBalance = await averageBalance(exoID)
+        const totalAverageCognitiveWorkload = await averageCognitiveWorkload(exoID)
 
-    const inputData = inputParser(
-      JSON.stringify({
-        totalAverageDiscomfort,
-        totalAverageSituationalAwareness,
-        totalAverageExertion,
-        totalAverageBalance,
-        totalAverageCognitiveWorkload,
-        totalAverageDiscomfortByField,
-        totalAverageCognitiveWorkloadByField,
-        totalAverageSituationalAwarenessByField,
-      }),
+        const totalAverageDiscomfortByField = await averageDiscomfortByField(exoID)
+        const totalAverageCognitiveWorkloadByField = await averageCognitiveWorkloadByField(exoID)
+        const totalAverageSituationalAwarenessByField = await averageSituationalAwarenessByField(exoID)
+
+        const inputData = inputParser(
+          JSON.stringify({
+            exoID,
+            totalAverageDiscomfort,
+            totalAverageSituationalAwareness,
+            totalAverageExertion,
+            totalAverageBalance,
+            totalAverageCognitiveWorkload,
+            totalAverageDiscomfortByField,
+            totalAverageCognitiveWorkloadByField,
+            totalAverageSituationalAwarenessByField,
+          }),
+        )
+
+        return inputData
+      })
     )
 
     // Create a new report document
-    const report = new Report({ userId: 1, inputData, status: 'pending' })
+    const report = new Report({ userId: 1, inputData: results, status: 'pending' })
 
     await report.save()
 
-    const digitalTwin = await generateDigitalTwinAnalysis(inputData)
+    const digitalTwin = await generateDigitalTwinAnalysis(results)
 
-    // Add the report generation job to the queue
+    // // Add the report generation job to the queue
     await reportGenerationQueue.add(
-      { reportId: report._id, inputData },
+      { reportId: report._id, inputData: results },
       { attempts: 3, backoff: { type: 'exponential', delay: 5000 } },
     )
 
@@ -57,6 +66,7 @@ const analyzeDataController = async (req, res, next) => {
       status: 'success',
       message: 'Subjective data analyzed successfully',
       data: {
+        data: "Please refactor based on data you want to pass to frontend",
         report: { reportId: report._id, status: report.status },
         digital_twin: digitalTwin,
       },

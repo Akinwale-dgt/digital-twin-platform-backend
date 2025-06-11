@@ -39,6 +39,13 @@ const CognitiveWorkloadSchema = new Schema(
       enum: CognitiveWorkloadEnum,
       required: true,
     },
+    exoID: {
+      type: Number
+    },
+    sessionID: {
+      type: String,
+      required: true
+    }
   },
   { timestamps: true },
 )

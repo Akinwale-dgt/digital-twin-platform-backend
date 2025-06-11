@@ -12,7 +12,6 @@ const generateDigitalTwinAnalysis = async (inputData) => {
   try {
     const outputParser = createDigitalTwinOutputParser()
     const prompt = createDigitalTwinPromptTemplate()
-
     // await prompt.format({
     //   input_data: JSON.stringify(inputData),
     // })
@@ -20,7 +19,9 @@ const generateDigitalTwinAnalysis = async (inputData) => {
     const chain = RunnableSequence.from([prompt, model, outputParser])
 
     const result = await chain.invoke({ input: inputData })
-    logger.info(`Report generated successfully: \n\n${JSON.stringify(result, null, 2)}`)
+    logger.info(
+      `Digital twin analysis generated successfully: \n\n${JSON.stringify(result, null, 2)}`,
+    )
 
     return result
   } catch (error) {

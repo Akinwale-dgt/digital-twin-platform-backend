@@ -45,6 +45,13 @@ const DiscomfortSchema = new Schema(
       enum: NumberEnum,
       required: true,
     },
+    exoID: {
+      type: Number
+    },
+    sessionID: {
+      type: String,
+      required: true
+    }
   },
   { timestamps: true },
 )

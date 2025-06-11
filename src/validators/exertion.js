@@ -9,6 +9,12 @@ const validateCreateExertionRoute = () => {
       .isInt()
       .withMessage('Rate of exertion must be an integer'),
 
+    body('exoID')
+      .exists()
+      .withMessage('ExoID is required')
+      .isInt()
+      .withMessage('ExoID must be an integer'),
+
     (req, res, next) => {
       const errors = validationResult(req)
 

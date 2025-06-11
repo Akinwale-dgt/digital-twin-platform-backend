@@ -2,10 +2,40 @@ import Usability from '../models/usability.js'
 import logger from '../utils/customLogger.js'
 
 export const createUsability = async (data) => {
-  const usability = await Usability.create(data)
+  const { sessionID, exoID, ...rest } = data;
+
+  if (!sessionID) {
+    throw new Error('sessionId is required');
+  }
+
+
+  const usability = await Usability.findOneAndUpdate(
+    { sessionID, exoID },
+    { $set: { ...rest, exoID, sessionID } }, 
+    {
+      new: true,
+      upsert: true,
+      setDefaultsOnInsert: true,
+    }
+  );
 
   return usability
 }
+
+export const getUsability = async (data) => {
+  const { sessionID, exoID } = data;
+
+  if (!sessionID) {
+    throw new Error('sessionId is required');
+  }
+
+  const discomfort = await Usability.findOne(
+    { sessionID, exoID}
+  );
+
+  return discomfort;
+};
+
 
 export const averageUsability = async () => {
   try {
