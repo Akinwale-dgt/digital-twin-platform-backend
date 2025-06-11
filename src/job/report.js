@@ -50,7 +50,7 @@ reportGenerationQueue.process(async (job) => {
 
     const readableTable = buildReadableTable(normalizationCompletion, calculatedWeight)
     // Generate the report
-    const reportData = await generateReport(inputData)
+    const reportData = await generateReport(readableTable)
 
     // Generate PDF
     // const pdfPath = await generatePDF(reportData, reportId)
