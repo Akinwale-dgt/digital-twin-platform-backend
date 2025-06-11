@@ -29,45 +29,28 @@ reportGenerationQueue.process(async (job) => {
 
     // Inferred analysis data
     const inferredAnalysisData = await inferredAnalysis(inputData)
-    console.log('Report Analysis Data --> ', inferredAnalysisData)
 
     const llmResult = serialiseLLMResult(inferredAnalysisData)
 
 
-    console.log('LLM Result --> ', llmResult)
-
 
     const calculatedCriterion = calculateCriterionSums(llmResult.transformedData)
 
-    console.log('Calculated Criterion --> ', calculatedCriterion)
-
     const normalizationCompletion = normalizeTransformedData(llmResult.transformedData, calculatedCriterion)
 
-    console.log('Normalized Result --> ', normalizationCompletion)
-
     const entropyComponents = calculateEntropyComponents(normalizationCompletion)
-    console.log('Entropy Result --> ', entropyComponents)
-
     // Step 4: Total entropy per criterion
     const totalEntropy = calculateTotalEntropy(entropyComponents)
-    console.log('Total Entropy --> ', totalEntropy)
 
     const calculatedDivergence = calculateDivergence(totalEntropy)
-    console.log('Total Divergence --> ', calculatedDivergence)
 
     const calculatedWeight = calculateWeights(calculatedDivergence)
-    console.log('Calculated Weight --> ', calculatedWeight)
 
     const finalScore = calculateFinalScores(normalizationCompletion, calculatedWeight)
-    console.log('Final Scores -->', finalScore)
 
     const readableTable = buildReadableTable(normalizationCompletion, calculatedWeight)
-    console.log('Readable Table -->', readableTable)
-
     // Generate the report
     const reportData = await generateReport(inputData)
-    console.log('Report Analysis Data --> ', reportData)
-    // console.log('Report data:', reportData)
 
     // Generate PDF
     // const pdfPath = await generatePDF(reportData, reportId)

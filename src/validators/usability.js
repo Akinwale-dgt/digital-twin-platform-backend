@@ -108,8 +108,6 @@ const validateCreateUsabilityRoute = () => {
     (req, res, next) => {
       const errors = validationResult(req)
 
-      console.log('Errors:', errors)
-
       if (!errors.isEmpty()) {
         return next(errors.array())
       }

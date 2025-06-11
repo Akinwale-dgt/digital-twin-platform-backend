@@ -12,8 +12,6 @@ const generateDigitalTwinAnalysis = async (inputData) => {
   try {
     const outputParser = createDigitalTwinOutputParser()
     const prompt = createDigitalTwinPromptTemplate()
-    console.log('Input Data:', inputData)
-
     // await prompt.format({
     //   input_data: JSON.stringify(inputData),
     // })
