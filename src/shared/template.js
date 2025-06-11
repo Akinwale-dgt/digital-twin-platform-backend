@@ -1,67 +1,26 @@
 export const REPORT_TEMPLATE = `
-    You are a decision-support analyst.
+    **System**  
+    You are an expert human‐factors and construction‐ergonomics analyst, skilled at translating quantitative evaluations into clear, actionable recommendations for non‐technical stakeholders.
 
-    Process:
+    **User**  
+    I’m evaluating three wearable exoskeletons for a construction task. Below is the final output from my entropy‐based MCDA pipeline:
 
-    1. Normalize Subjective Inputs (0–1)
-       • TLX items: divide each 0–20 value by 20  
-       • Discomfort: divide each 0–10 value by 10  
-       • Exertion: map 6–20 → (value – 6) / 14  
-       • Balance: divide each 0–10 value by 10  
-       • Usability: map 1–5 → (value – 1) / 4  
-       • Situational Awareness: map 1–7 → (value – 1) / 6  
+    Instruction
 
-       Save results as "subjective_norm".
+    Please generate a comprehensive comparative report that:
 
-    2. Infer & Normalize Objective Metrics (0–1) from subjective_norm:
-       – cognitive_load_psd  from TLX
-       – fall_risk_pressure  from Balance
-       – muscle_activity_EMG from Discomfort 
-       – range_of_motion_IMU From Discomfort & Usability
-       – exertion_ppg_eda    from exertion
+    Compares the three exoskeletons side‐by‐side in a table, highlighting the largest performance differentials.
+    Ranks them in order of suitability for the tested construction‐task scenario.
+    Summarizes the evaluation criteria and scoring method (entropy‐based MCDA).
+    Describes each exoskeleton’s strengths and weaknesses across all criteria.
+    Recommends which exoskeleton(s) stakeholders should choose, and under what specific conditions (e.g., if ease of use is paramount vs. comfort).
 
-    3. Compute Facilitator Vector Fi:
-       physical_exertion_reduction = 1 – muscle_activity  
-       light_cognitive_load        = 1 – cognitive_load_psd  
-       stability                   = 1 – fall_risk_pressure  
-       compatibility               = range_of_motion  
-       comfort                     = 1 – mean(subjective_norm.discomfort.*)  
-       productivity                = subjective_norm.cognitive_load.performance  
-       usability                   = mean(subjective_norm.usability.*)  
-
-    4. Compute Barrier Vector Bi:
-       overexertion       = muscle_activity  
-       psychological_risk = cognitive_load_psd  
-       increased_fall_risk= fall_risk_pressure  
-       incompatibility    = 1 – range_of_motion  
-       discomfort         = mean(subjective_norm.discomfort.*)  
-       usability_concern  = 1 – mean(subjective_norm.usability.*)  
-
-    5. Entropy-Method Weights:
-       Compute weight w_j for each of the 13 criteria (7 Fi + 6 Bi) using the entropy method.•	Entropy Method: The EWM is an objective weighting technique rooted in information theory. It operates on the premise that the more dispersed or varied the data for a particular criterion across alternatives, the more information that criterion provides for decision-making. Consequently, such criteria are assigned higher weights.
-
-    6. Unified NetScore:
-       NetScore = sum(all Fi values) – sum(all Bi values), i.e., ∑ w_i·Fi – ∑ w_j·Bj 
-
-    7. Generate a full report in Markdown format with the following structure:
-       # Exoskeleton Use Report
-
-      Start by providing the normalized rating of the subjective inputs.
-
-      Next, provide the inferred and normalized objective metrics.
-
-      Next, Provide the facilitators and barriers with their entropy weight and show how the net weight (i.e., the unified score)
-       A Markdown table with columns:
-       Criterion | Facilitator (Fi) | Barrier (Bi) | Weight
-       One row per criterion.
-
-      Next, Prepare A short note explaining the analysis from the subjective analysis results to the Unified NetScore of Benefit-Risk analysis and identifying the top facilitator and top barrier. Rand-up any decimals to 2 decimal digits.
-
-      Add analysis highlights and recommendations.
+    Structure the report with clear section headings, bullet‐points for key takeaways, and a concise executive summary at the top.
     
     Input:
     {input}
 `
+
 export const INFERRED_OBJ_TEMPLATE = `
     You are a decision-support analyst.
 

@@ -2,7 +2,7 @@ import Bull from 'bull'
 // import path from 'path'
 // import { fileURLToPath } from 'url'
 import Report from '../models/report.js'
-// import generateReport from '../service/report.js'
+import generateReport from '../service/report.js'
 import inferredAnalysis from '../service/inferredAnalysis.js'
 // import generatePDF from '../utils/generatePdfV3.js'
 import logger from '../utils/customLogger.js'
@@ -65,8 +65,8 @@ reportGenerationQueue.process(async (job) => {
     console.log('Readable Table -->', readableTable)
 
     // Generate the report
-    // const reportAnalysisData = await generateReport(inputData)
-    // console.log('Report Analysis Data --> ', reportAnalysisData)
+    const reportData = await generateReport(inputData)
+    console.log('Report Analysis Data --> ', reportData)
     // console.log('Report data:', reportData)
 
     // Generate PDF
@@ -79,7 +79,7 @@ reportGenerationQueue.process(async (job) => {
     await Report.findByIdAndUpdate(reportId, {
       status: 'completed',
       inferredAnalysis: inferredAnalysisData,
-      // results: { report_markdown: reportData.content, id: reportData.id },
+      results: { report_markdown: reportData.content, id: reportData.id },
       // pdfPath: relativePdfPath,
     })
 
