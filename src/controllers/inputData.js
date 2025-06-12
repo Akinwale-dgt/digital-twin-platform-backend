@@ -9,8 +9,8 @@ import {
 import { createDiscomfort } from '../service/discomfort.js'
 import { createExertion, processExertionData } from '../service/exertion.js'
 import { createSituationalAwareness } from '../service/situationAwareness.js'
-import processFallRiskData from '../service/fallRisk.js'
-import { Measure } from '../shared/constants.js'
+// import processFallRiskData from '../service/fallRisk.js'
+// import { Measure } from '../shared/constants.js'
 import { createUsability, getUsability } from '../service/usability.js'
 
 export const createDiscomfortController = async (req, res, next) => {
