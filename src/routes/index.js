@@ -5,7 +5,6 @@ import {
   createExertionController,
   createBalanceController,
   createSituationalAwarenessController,
-  uploadFileController,
   createUsabilityController,
   getUsabilityController,
 } from '../controllers/inputData.js'
@@ -15,7 +14,6 @@ import validateCreateCognitiveWorkloadRoute from '../validators/cognitiveWorkloa
 import validateCreateExertionRoute from '../validators/exertion.js'
 import validateCreateBalanceRoute from '../validators/balance.js'
 import validateCreateSituationalAwarenessRoute from '../validators/situationalAwareness.js'
-import uploadFile from '../middleware/upload.js'
 import resetSubjectiveController from '../controllers/reset.js'
 import analyzeDataController from '../controllers/analyze.js'
 import { getReportController, reportStatusController, viewReportController } from '../controllers/report.js'
