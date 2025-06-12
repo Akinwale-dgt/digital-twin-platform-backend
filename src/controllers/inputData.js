@@ -128,33 +128,33 @@ export const getUsabilityController = async (req, res, next) => {
 }
 
 
-export const uploadFileController = async (req, res, next) => {
-  try {
-    if (!req.file) throw new httpError.BadRequest('No address file uploaded')
+// export const uploadFileController = async (req, res, next) => {
+//   try {
+//     if (!req.file) throw new httpError.BadRequest('No address file uploaded')
 
-    if (
-      req.file.mimetype !== 'text/csv' &&
-      req.file.mimetype !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    )
-      throw new httpError.BadRequest('File uploaded is not CSV or Excel')
+//     if (
+//       req.file.mimetype !== 'text/csv' &&
+//       req.file.mimetype !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+//     )
+//       throw new httpError.BadRequest('File uploaded is not CSV or Excel')
 
-    const data = req.file.buffer.toString()
+//     const data = req.file.buffer.toString()
 
-    let processedData
-    if (req.body.measure === Measure.cognitiveWorkload) {
-      processedData = await processCognitiveWorkloadData(data.replace(/\r/g, ''))
-    } else if (req.body.measure === Measure.fallRisk) {
-      processedData = await processFallRiskData(data.replace(/\r/g, ''))
-    } else if (req.body.measure === Measure.exertion) {
-      processedData = await processExertionData(data.replace(/\r/g, ''))
-    }
+//     let processedData
+//     if (req.body.measure === Measure.cognitiveWorkload) {
+//       processedData = await processCognitiveWorkloadData(data.replace(/\r/g, ''))
+//     } else if (req.body.measure === Measure.fallRisk) {
+//       processedData = await processFallRiskData(data.replace(/\r/g, ''))
+//     } else if (req.body.measure === Measure.exertion) {
+//       processedData = await processExertionData(data.replace(/\r/g, ''))
+//     }
 
-    return res.status(200).send({
-      status: 'success',
-      message: 'File uploaded successfully',
-      data: processedData,
-    })
-  } catch (error) {
-    next(error)
-  }
-}
+//     return res.status(200).send({
+//       status: 'success',
+//       message: 'File uploaded successfully',
+//       data: processedData,
+//     })
+//   } catch (error) {
+//     next(error)
+//   }
+// }
