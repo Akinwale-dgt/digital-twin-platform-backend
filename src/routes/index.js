@@ -60,7 +60,7 @@ router.post(
 
 router.get('/usability/:id', getUsabilityController)
 
-router.get('/analyze-subjective-data', analyzeSubjectiveData)
+// router.get('/analyze-subjective-data', analyzeSubjectiveData)
 
 // router.post('/analyze-data', analyzeDataController)
 router.get('/analyze-data', analyzeDataController)
