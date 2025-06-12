@@ -2,12 +2,9 @@
 import httpError from 'http-errors'
 
 import { createBalance } from '../service/balance.js'
-import {
-  createCognitiveWorkload,
-  processCognitiveWorkloadData,
-} from '../service/cognitiveWorkload.js'
+import { createCognitiveWorkload } from '../service/cognitiveWorkload.js'
 import { createDiscomfort } from '../service/discomfort.js'
-import { createExertion, processExertionData } from '../service/exertion.js'
+import { createExertion } from '../service/exertion.js'
 import { createSituationalAwareness } from '../service/situationAwareness.js'
 // import processFallRiskData from '../service/fallRisk.js'
 // import { Measure } from '../shared/constants.js'
