@@ -98,24 +98,24 @@ export const averageCognitiveWorkloadByField = async (exoID) => {
   }
 }
 
-function parseNumeric(value) {
-  const parsed = parseFloat(value)
-  return Number.isNaN(parsed) ? 0 : parsed
-}
+// function parseNumeric(value) {
+//   const parsed = parseFloat(value)
+//   return Number.isNaN(parsed) ? 0 : parsed
+// }
 
-export async function processCognitiveWorkloadData(csvData) {
-  const jsonData = await csv2json(csvData)
-  const wavelet = 'db4'
+// export async function processCognitiveWorkloadData(csvData) {
+//   const jsonData = await csv2json(csvData)
+//   const wavelet = 'db4'
 
-  // Identify EEG channels (all columns except 'time')
-  const channels = Object.keys(jsonData[0]).filter((key) => key !== 'time')
+//   // Identify EEG channels (all columns except 'time')
+//   const channels = Object.keys(jsonData[0]).filter((key) => key !== 'time')
 
-  // Extract and transform data for each channel
-  const transformedData = channels.map((channel) => {
-    const channelData = jsonData.map((row) => parseNumeric(row[channel]))
-    // Apply Discrete Wavelet Transform to each channel's data
-    return dwt.dwt(channelData, wavelet)
-  })
+//   // Extract and transform data for each channel
+//   const transformedData = channels.map((channel) => {
+//     const channelData = jsonData.map((row) => parseNumeric(row[channel]))
+//     // Apply Discrete Wavelet Transform to each channel's data
+//     return dwt.dwt(channelData, wavelet)
+//   })
 
-  return transformedData
-}
+//   return transformedData
+// }
