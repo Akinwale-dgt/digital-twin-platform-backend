@@ -18,23 +18,14 @@ export const createInferredAnalysisOutputParser = () => {
     z.array(
       z.object({
         exoID: z.string().optional(), // Optional exoskeleton ID
-        objective_metrics: z.object({
+        metrics: z.object({
           cognitive_load_psd: z.number(),
           fall_risk_pressure: z.number(),
           muscle_activity: z.number(),
           range_of_motion: z.number(),
           exertion_ppg_eda: z.number(),
-          exoID: z.string().optional(), // Optional exoskeleton ID
-        }),
-        facilitators: z.object({
-          physical_exertion_reduction: z.number(),
-          light_cognitive_load: z.number(),
-          stability: z.number(),
-          compatibility: z.number(),
-          comfort: z.number(),
-          productivity: z.number(),
           usability: z.number(),
-          exoID: z.string().optional(), // Optional exoskeleton ID
+          performance: z.number(),
         }),
       }),
     ),
