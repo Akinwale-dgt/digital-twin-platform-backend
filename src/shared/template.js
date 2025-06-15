@@ -27,12 +27,13 @@ export const INFERRED_OBJ_TEMPLATE = `
     Process:
 
     1. Normalize Subjective Inputs (0–1)
-       • TLX items: divide each 0–20 value by 20  
-       • Discomfort: divide each 0–10 value by 10  
+       • TLX items (mental_demand, physical_demand, temporal_demand, performance, effort, frustration): divide each 0–20 value by 20 and sum them 
+       • Discomfort (hand_wrist, upper_arm, shoulder, lower_back, thigh, neck, lower_leg_foot): divide each 0–10 value by 10 and sum them
        • Exertion: map 6–20 → (value – 6) / 14  
        • Balance: divide each 0–10 value by 10  
-       • Usability: map 1–5 → (value – 1) / 4  
-       • Situational Awareness: map 1–7 → (value – 1) / 6  
+       • performance.TLX: divide 0–20 value by 20  
+       • Usability (ease of use, ease of learning, and comfort): map 1–5 → (value – 1) / 4  
+       • Situational Awareness (instability of situation, complexity of situation, variability of situation, arousal, concentration of attention, division of attention, spare mental capacity, information quantity, and familiarity with situation): map 1–7 → (value – 1) / 6  
 
        Save results as "subjective_norm".
 
@@ -43,40 +44,21 @@ export const INFERRED_OBJ_TEMPLATE = `
        – range_of_motion_IMU From Discomfort & Usability
        – exertion_ppg_eda    from exertion
 
-       Save results as "objective_metrics".
-
-    3. Compute Facilitator Vector Fi:
-       physical_exertion_reduction = 1 – muscle_activity  
-       light_cognitive_load        = 1 – cognitive_load_psd  
-       stability                   = 1 – fall_risk_pressure  
-       compatibility               = range_of_motion  
-       comfort                     = 1 – mean(subjective_norm.discomfort.*)  
-       productivity                = subjective_norm.cognitive_load.performance  
-       usability                   = mean(subjective_norm.usability.*)  
-
     ---
     Return ONLY a valid JSON object with the following top-level keys:
 
         - [{{
-                "exoID": string, // Optional exoskeleton ID
-              "objective_metrics": {{
+              "exoID": string, // Optional exoskeleton ID
+              "metrics": {{
                     "cognitive_load_psd": number,
                     "fall_risk_pressure": number,
                     "muscle_activity": number,
                     "range_of_motion": number,
                     "exertion_ppg_eda": number,
-                }},
-
-                "facilitators": {{
-                  "physical_exertion_reduction": number,
-                  "light_cognitive_load": number,
-                  "stability": number,
-                  "compatibility": number,
-                  "comfort": number,
-                  "productivity": number,
-                  "usability": number,
-                }},
-            }}]
+                    "usability": number,
+                    "performance": number,
+              }},
+          }}]
     
     DO NOT return any text or explanation outside this JSON.
     DO NOT use null values - always provide valid numbers and categories.

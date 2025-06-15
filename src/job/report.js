@@ -30,9 +30,9 @@ reportGenerationQueue.process(async (job) => {
     // Inferred analysis data
     const inferredAnalysisData = await inferredAnalysis(inputData)
 
+    console.log('inferredAnalysisData', inferredAnalysisData)
+
     const llmResult = serialiseLLMResult(inferredAnalysisData)
-
-
 
     const calculatedCriterion = calculateCriterionSums(llmResult.transformedData)
 

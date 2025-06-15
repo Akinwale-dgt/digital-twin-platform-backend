@@ -2,60 +2,39 @@
  * Report Analysis Data -->  [
   {
     exoID: '1',
-    objective_metrics: {
-      cognitive_load_psd: 0.5,
-      fall_risk_pressure: 0.9,
-      muscle_activity: 0.34,
-      range_of_motion: 0.75,
-      exertion_ppg_eda: 0.79
+    "metrics": {
+      "cognitive_load_psd": number,
+      "fall_risk_pressure": number,
+      "muscle_activity": number,
+      "range_of_motion": number,
+      "exertion_ppg_eda": number,
+      "usability": number,
+      "performance": number,
     },
-    facilitators: {
-      physical_exertion_reduction: 0.66,
-      light_cognitive_load: 0.5,
-      stability: 0.1,
-      compatibility: 0.75,
-      comfort: 0.66,
-      productivity: 0.79,
-      usability: 0.75
-    }
   },
   {
     exoID: '2',
-    objective_metrics: {
-      cognitive_load_psd: 0.48,
-      fall_risk_pressure: 0.9,
-      muscle_activity: 0.34,
-      range_of_motion: 0.75,
-      exertion_ppg_eda: 0.79
+    "metrics": {
+      "cognitive_load_psd": number,
+      "fall_risk_pressure": number,
+      "muscle_activity": number,
+      "range_of_motion": number,
+      "exertion_ppg_eda": number,
+      "usability": number,
+      "performance": number,
     },
-    facilitators: {
-      physical_exertion_reduction: 0.66,
-      light_cognitive_load: 0.52,
-      stability: 0.1,
-      compatibility: 0.75,
-      comfort: 0.66,
-      productivity: 0.79,
-      usability: 0.75
-    }
   },
   {
     exoID: '3',
-    objective_metrics: {
-      cognitive_load_psd: 0.48,
-      fall_risk_pressure: 0.9,
-      muscle_activity: 0.34,
-      range_of_motion: 0.75,
-      exertion_ppg_eda: 0.79
+    "metrics": {
+      "cognitive_load_psd": number,
+      "fall_risk_pressure": number,
+      "muscle_activity": number,
+      "range_of_motion": number,
+      "exertion_ppg_eda": number,
+      "usability": number,
+      "performance": number,
     },
-    facilitators: {
-      physical_exertion_reduction: 0.66,
-      light_cognitive_load: 0.52,
-      stability: 0.1,
-      compatibility: 0.75,
-      comfort: 0.66,
-      productivity: 0.79,
-      usability: 0.75
-    }
   }
 ]
 
@@ -103,15 +82,15 @@ export function serialiseLLMResult(llmResult) {
   // SAMPLE EXPECTED DATA FROM LLMS
 
   return {
-    transformedData: llmResult.map(({ facilitators, exoID }) => ({
+    transformedData: llmResult.map(({ metrics, exoID }) => ({
       exoID,
-      reducedExertion: facilitators.physical_exertion_reduction,
-      lightCognitiveLoad: facilitators.light_cognitive_load,
-      stability: facilitators.stability,
-      compatibility: facilitators.compatibility,
-      easeOfUse: facilitators.usability,
-      productivity: facilitators.productivity,
-      comfort: facilitators.comfort,
+      reducedExertion: 1 - metrics.muscle_activity,
+      lightCognitiveLoad: 1 - metrics.cognitive_load_psd,
+      stability: 1 - metrics.fall_risk_pressure,
+      compatibility: metrics.range_of_motion,
+      easeOfUse: metrics.usability,
+      productivity: metrics.performance,
+      comfort: metrics.discomfort,
     })),
   }
 }
