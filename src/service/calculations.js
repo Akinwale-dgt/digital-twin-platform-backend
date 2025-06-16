@@ -97,24 +97,17 @@ export function serialiseLLMResult(llmResult) {
 }
 
 export function renamedBasedOnCriteria(data) {
-  const criteria = {
-    C1: 'reducedExertion',
-    C2: 'lightCognitiveLoad',
-    C3: 'stability',
-    C4: 'compatibility',
-    C5: 'easeOfUse',
-    C6: 'productivity',
-    C7: 'comfort',
-    C8: 'reducedWMSDs',
-  }
-
-  const criteriaValue = data.map((exo) =>
-    Object.entries(criteria).reduce((criterion, [key, field]) => {
-      return { ...criterion, [key]: exo[field], exoID: exo.exoID };
-    }, {})
-  );
-
-  return criteriaValue
+  return data.map((exo) => ({
+    exoID: exo.exoID,
+    C1: exo.reducedExertion,
+    C2: exo.lightCognitiveLoad,
+    C3: exo.stability,
+    C4: exo.compatibility,
+    C5: exo.easeOfUse,
+    C6: exo.productivity,
+    C7: exo.comfort,
+    C8: exo.reducedWMSDs,
+  }))
 }
 
 export function calculateCriterionSums(data) {
@@ -245,7 +238,8 @@ export function buildReadableTable(criteriaValue, weights) {
       const criterionValue = exo[key]
       const weightedValue = criterionValue * weights[key]
 
-      readable[readableKey] = parseFloat(criterionValue.toFixed(4))
+      // readable[readableKey] = parseFloat(criterionValue.toFixed(4))
+      readable[readableKey] = parseFloat(weightedValue.toFixed(4))
       total += weightedValue
     }
 
