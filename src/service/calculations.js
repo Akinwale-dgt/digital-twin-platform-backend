@@ -200,21 +200,21 @@ export function calculateWeights(divergence) {
   return weight
 }
 
-export function calculateFinalScores(normalizedData, weights) {
-  return normalizedData.map((exo) => {
-    let score = 0
+// export function calculateFinalScores(normalizedData, weights) {
+//   return normalizedData.map((exo) => {
+//     let score = 0
 
-    for (let i = 1; i <= 8; i++) {
-      const key = `C${i}`
-      score += (exo[key] ?? 0) * (weights[key] ?? 0)
-    }
+//     for (let i = 1; i <= 8; i++) {
+//       const key = `C${i}`
+//       score += (exo[key] ?? 0) * (weights[key] ?? 0)
+//     }
 
-    return {
-      exoID: exo.exoID,
-      score: parseFloat(score.toFixed(4)),
-    }
-  })
-}
+//     return {
+//       exoID: exo.exoID,
+//       score: parseFloat(score.toFixed(4)),
+//     }
+//   })
+// }
 
 export function buildReadableTable(criteriaValue, weights) {
   const criterionMap = {
