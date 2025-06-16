@@ -1,3 +1,4 @@
+import { usability } from '../shared/validations.js'
 import logger from './customLogger.js'
 
 // Helper function to fix null values in the parsed data
@@ -84,33 +85,21 @@ const errorParser = async (error) => {
 export const inputParser = (inputData) => {
   const {
     totalAverageDiscomfort,
+    totalAverageUsability,
     totalAverageSituationalAwareness,
     totalAverageExertion,
     totalAverageBalance,
     totalAverageCognitiveWorkload,
     totalAverageDiscomfortByField,
+    totalAverageUsabilityByField,
     totalAverageCognitiveWorkloadByField,
     totalAverageSituationalAwarenessByField,
-    exoID
+    exoID,
   } = JSON.parse(inputData)
-
-  const totalAveragePercentDiscomfort = (totalAverageDiscomfort / 70) * 100
-  const totalAveragePercentBalance = (totalAverageBalance / 10) * 100
-  const totalAveragePercentExertion = (totalAverageExertion / 20) * 100
-  const totalAveragePercentCognitiveWorkload = (totalAverageCognitiveWorkload / 120) * 100
-  const totalAveragePercentSituationalAwareness = (totalAverageSituationalAwareness / 63) * 100
-
-  const weightedSumRating =
-    (totalAveragePercentBalance +
-      totalAveragePercentCognitiveWorkload +
-      totalAveragePercentExertion +
-      totalAveragePercentDiscomfort +
-      totalAveragePercentSituationalAwareness) /
-    5
 
   return {
     discomfort: {
-      hand_and_wait: totalAverageDiscomfortByField?.avgHandAndWaist,
+      hand_and_waist: totalAverageDiscomfortByField?.avgHandAndWaist,
       upper_arm: totalAverageDiscomfortByField?.avgUpperArm,
       shoulder: totalAverageDiscomfortByField?.avgShoulder,
       lower_back: totalAverageDiscomfortByField?.avgLowerBack,
@@ -118,6 +107,25 @@ export const inputParser = (inputData) => {
       neck: totalAverageDiscomfortByField?.avgNeck,
       lower_leg_and_foot: totalAverageDiscomfortByField?.avgLowerLegAndFoot,
       totalAverage: totalAverageDiscomfort,
+    },
+    usability: {
+      don_and_doff: totalAverageUsabilityByField?.avgDonAndDoff,
+      adjust_fitting: totalAverageUsabilityByField?.avgAdjustFitting,
+      works_as_expected: totalAverageUsabilityByField?.avgWorksAsExpected,
+      meets_need: totalAverageUsabilityByField?.avgMeetsNeed,
+      accomplish_task: totalAverageUsabilityByField?.avgAccomplishTask,
+      without_assistance: totalAverageUsabilityByField?.avgWithoutAssistance,
+      work_with: totalAverageUsabilityByField?.avgWorkWith,
+      restricts_movement: totalAverageUsabilityByField?.avgRestrictsMovement,
+      interfere_with_environment: totalAverageUsabilityByField?.avgInterfereWithEnvironment,
+      satisfaction: totalAverageUsabilityByField?.avgSatisfaction,
+      need_to_learn: totalAverageUsabilityByField?.avgNeedToLearn,
+      easily_learn_to_assemble: totalAverageUsabilityByField?.avgEasilyLearnToAssemble,
+      easily_learn_to_adjust: totalAverageUsabilityByField?.avgEasilyLearnToAdjust,
+      easily_learn_checks: totalAverageUsabilityByField?.avgEasilyLearnChecks,
+      remember_how_to_use: totalAverageUsabilityByField?.avgRememberHowToUse,
+      use_again_without_assistance: totalAverageUsabilityByField?.avgUseAgainWithoutAssistance,
+      totalAverage: totalAverageUsability,
     },
     cognitive_load: {
       mental_demand: totalAverageCognitiveWorkloadByField?.avgMentalDemand,
@@ -142,15 +150,9 @@ export const inputParser = (inputData) => {
         totalAverageSituationalAwarenessByField?.avgFamiliarityWithSituation,
       totalAverage: totalAverageSituationalAwareness,
     },
-    usability: {
-      ease_of_use: 3,
-      comfort: 5,
-      ease_of_learning: 4,
-    },
     exertion: totalAverageExertion,
     balance: totalAverageBalance,
-    weightedSumRating,
-    exoID
+    exoID,
   }
 }
 

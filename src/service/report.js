@@ -4,7 +4,7 @@ import logger from '../utils/customLogger.js'
 import model from '../shared/openai.js'
 
 // Function to generate the report using OpenAI and LangChain
-async function generateReport(inputData) {
+async function llmGenerateReport(inputData) {
   try {
     // const parser = createExoskeletonOutputParser()
     const prompt = createExoskeletonPromptTemplate()
@@ -28,4 +28,4 @@ async function generateReport(inputData) {
   }
 }
 
-export default generateReport
+export default llmGenerateReport

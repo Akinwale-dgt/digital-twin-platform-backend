@@ -14,6 +14,7 @@ import { averageExertion } from '../service/exertion.js'
 import { averageBalance } from '../service/balance.js'
 import generateDigitalTwinAnalysis from '../service/digitalTwin.js'
 import { inputParser } from '../utils/parser.js'
+import { averageUsability, averageUsabilityByField } from '../service/usability.js'
 
 const analyzeDataController = async (req, res, next) => {
   try {
@@ -22,12 +23,14 @@ const analyzeDataController = async (req, res, next) => {
     const results = await Promise.all(
       exoIDs.map(async (exoID) => {
         const totalAverageDiscomfort = await averageDiscomfort(exoID)
+        const totalAverageUsability = await averageUsability(exoID)
         const totalAverageSituationalAwareness = await averageSituationalAwareness(exoID)
         const totalAverageExertion = await averageExertion(exoID)
         const totalAverageBalance = await averageBalance(exoID)
         const totalAverageCognitiveWorkload = await averageCognitiveWorkload(exoID)
 
         const totalAverageDiscomfortByField = await averageDiscomfortByField(exoID)
+        const totalAverageUsabilityByField = await averageUsabilityByField(exoID)
         const totalAverageCognitiveWorkloadByField = await averageCognitiveWorkloadByField(exoID)
         const totalAverageSituationalAwarenessByField = await averageSituationalAwarenessByField(exoID)
 
@@ -35,11 +38,13 @@ const analyzeDataController = async (req, res, next) => {
           JSON.stringify({
             exoID,
             totalAverageDiscomfort,
+            totalAverageUsability,
             totalAverageSituationalAwareness,
             totalAverageExertion,
             totalAverageBalance,
             totalAverageCognitiveWorkload,
             totalAverageDiscomfortByField,
+            totalAverageUsabilityByField,
             totalAverageCognitiveWorkloadByField,
             totalAverageSituationalAwarenessByField,
           }),

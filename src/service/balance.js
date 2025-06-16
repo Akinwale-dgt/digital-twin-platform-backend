@@ -25,7 +25,7 @@ export const averageBalance = async (exoID) => {
   try {
     const result = await Balance.aggregate([
       {
-        $match: { exoID: exoID },
+        $match: { exoID },
       },
       {
         $group: {

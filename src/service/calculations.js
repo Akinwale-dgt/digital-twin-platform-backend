@@ -89,13 +89,33 @@ export function serialiseLLMResult(llmResult) {
       stability: 1 - metrics.fall_risk_pressure,
       compatibility: metrics.range_of_motion,
       easeOfUse: metrics.usability,
-      productivity: metrics.performance,
+      productivity: 1 - metrics.performance,
       comfort: metrics.discomfort,
+      reducedWMSDs: 1 - metrics.muscle_activity,
     })),
   }
 }
 
-export function normalizationForReducedExersion() {}
+export function renamedBasedOnCriteria(data) {
+  const criteria = {
+    C1: 'reducedExertion',
+    C2: 'lightCognitiveLoad',
+    C3: 'stability',
+    C4: 'compatibility',
+    C5: 'easeOfUse',
+    C6: 'productivity',
+    C7: 'comfort',
+    C8: 'reducedWMSDs',
+  }
+
+  const criteriaValue = data.map((exo) =>
+    Object.entries(criteria).reduce((criterion, [key, field]) => {
+      return { ...criterion, [key]: exo[field], exoID: exo.exoID };
+    }, {})
+  );
+
+  return criteriaValue
+}
 
 export function calculateCriterionSums(data) {
   const criteria = {
@@ -106,6 +126,7 @@ export function calculateCriterionSums(data) {
     C5: 'easeOfUse',
     C6: 'productivity',
     C7: 'comfort',
+    C8: 'reducedWMSDs',
   }
 
   const sums = {}
@@ -127,6 +148,7 @@ export function normalizeTransformedData(data, criterionSums) {
     C5: exo.easeOfUse / criterionSums.C5,
     C6: exo.productivity / criterionSums.C6,
     C7: exo.comfort / criterionSums.C7,
+    C8: exo.reducedWMSDs / criterionSums.C8,
   }))
 }
 
@@ -134,7 +156,7 @@ export function calculateEntropyComponents(normalizedData) {
   return normalizedData.map((exo) => {
     const result = { exoID: exo.exoID }
 
-    for (let i = 1; i <= 7; i++) {
+    for (let i = 1; i <= 8; i++) {
       const key = `C${i}`
       const value = exo[key]
       result[key] = value > 0 ? value * Math.log(value) : 0
@@ -148,7 +170,7 @@ export function calculateTotalEntropy(entropyComponents) {
   const K = 1 / Math.log(3)
   const result = {}
 
-  for (let i = 1; i <= 7; i++) {
+  for (let i = 1; i <= 8; i++) {
     const key = `C${i}`
 
     const sum = entropyComponents.reduce((acc, exo) => {
@@ -165,7 +187,7 @@ export function calculateTotalEntropy(entropyComponents) {
 export function calculateDivergence(totalEntropy) {
   const divergence = {}
 
-  for (let i = 1; i <= 7; i++) {
+  for (let i = 1; i <= 8; i++) {
     const key = `C${i}`
     divergence[key] = 1 - totalEntropy[key]
   }
@@ -177,7 +199,7 @@ export function calculateWeights(divergence) {
   const weight = {}
   const sumOfDivergence = Object.values(divergence).reduce((sum, val) => sum + val, 0)
 
-  for (let i = 1; i <= 7; i++) {
+  for (let i = 1; i <= 8; i++) {
     const key = `C${i}`
     weight[key] = divergence[key] / sumOfDivergence
   }
@@ -189,7 +211,7 @@ export function calculateFinalScores(normalizedData, weights) {
   return normalizedData.map((exo) => {
     let score = 0
 
-    for (let i = 1; i <= 7; i++) {
+    for (let i = 1; i <= 8; i++) {
       const key = `C${i}`
       score += (exo[key] ?? 0) * (weights[key] ?? 0)
     }
@@ -201,7 +223,7 @@ export function calculateFinalScores(normalizedData, weights) {
   })
 }
 
-export function buildReadableTable(normalizedData, weights) {
+export function buildReadableTable(criteriaValue, weights) {
   const criterionMap = {
     C1: 'reducedExertion',
     C2: 'lightCognitiveLoad',
@@ -210,19 +232,20 @@ export function buildReadableTable(normalizedData, weights) {
     C5: 'easeOfUse',
     C6: 'productivity',
     C7: 'comfort',
+    C8: 'reducedWMSDs',
   }
 
-  return normalizedData.map((exo) => {
+  return criteriaValue.map((exo) => {
     const readable = { exoID: exo.exoID }
     let total = 0
 
-    for (let i = 1; i <= 7; i++) {
+    for (let i = 1; i <= 8; i++) {
       const key = `C${i}`
       const readableKey = criterionMap[key]
-      const normalizedValue = exo[key]
-      const weightedValue = normalizedValue * weights[key]
+      const criterionValue = exo[key]
+      const weightedValue = criterionValue * weights[key]
 
-      readable[readableKey] = parseFloat(normalizedValue.toFixed(4))
+      readable[readableKey] = parseFloat(criterionValue.toFixed(4))
       total += weightedValue
     }
 

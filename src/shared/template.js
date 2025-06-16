@@ -31,7 +31,7 @@ export const INFERRED_OBJ_TEMPLATE = `
        • Discomfort (hand_wrist, upper_arm, shoulder, lower_back, thigh, neck, lower_leg_foot): divide each 0–10 value by 10 and sum them
        • Exertion: map 6–20 → (value – 6) / 14  
        • Balance: divide each 0–10 value by 10  
-       • performance.TLX: divide 0–20 value by 20  
+       • TLX.performance: divide 0–20 value by 20  
        • Usability (ease of use, ease of learning, and comfort): map 1–5 → (value – 1) / 4  
        • Situational Awareness (instability of situation, complexity of situation, variability of situation, arousal, concentration of attention, division of attention, spare mental capacity, information quantity, and familiarity with situation): map 1–7 → (value – 1) / 6  
 
@@ -57,6 +57,7 @@ export const INFERRED_OBJ_TEMPLATE = `
                     "exertion_ppg_eda": number,
                     "usability": number,
                     "performance": number,
+                    "discomfort": number
               }},
           }}]
     
