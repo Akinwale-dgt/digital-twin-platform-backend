@@ -2,22 +2,21 @@ import SituationalAwareness from '../models/situationalAwareness.js'
 import logger from '../utils/customLogger.js'
 
 export const createSituationalAwareness = async (data) => {
-  const { sessionID, exoID, ...rest } = data;
+  const { sessionID, exoID, ...rest } = data
 
   if (!sessionID) {
-    throw new Error('sessionId is required');
+    throw new Error('sessionId is required')
   }
-
 
   const situationalAwareness = await SituationalAwareness.findOneAndUpdate(
     { sessionID, exoID },
-    { $set: { ...rest, exoID, sessionID } }, 
+    { $set: { ...rest, exoID, sessionID } },
     {
       new: true,
       upsert: true,
       setDefaultsOnInsert: true,
-    }
-  );
+    },
+  )
 
   return situationalAwareness
 }
@@ -26,21 +25,42 @@ export const averageSituationalAwareness = async (exoID) => {
   try {
     const result = await SituationalAwareness.aggregate([
       {
-        $match: { exoID: exoID },
+        $match: { exoID },
       },
       {
         $addFields: {
-          total: {
-            $sum: [
-              '$instability_of_situation',
-              '$complexity_of_situation',
-              '$variability_of_situation',
-              '$arousal',
-              '$concentration_of_attention',
-              '$division_of_attention',
-              '$spare_mental_capacity',
-              '$information_quantity',
-              '$familiarity_with_situation',
+          fields: [
+            '$instability_of_situation',
+            '$complexity_of_situation',
+            '$variability_of_situation',
+            '$arousal',
+            '$concentration_of_attention',
+            '$division_of_attention',
+            '$spare_mental_capacity',
+            '$information_quantity',
+            '$familiarity_with_situation',
+          ],
+        },
+      },
+      {
+        $addFields: {
+          validFields: {
+            $filter: {
+              input: '$fields',
+              cond: { $ne: ['$this', null] },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          total: { $sum: '$validFields' },
+          itemCount: { $size: '$validFields' },
+          documentAverage: {
+            $cond: [
+              { $gt: [{ $size: '$validFields' }, 0] },
+              { $divide: [{ $sum: '$validFields' }, { $size: '$validFields' }] },
+              0,
             ],
           },
         },
@@ -49,10 +69,13 @@ export const averageSituationalAwareness = async (exoID) => {
         $group: {
           _id: '$exoID',
           exoID: { $first: '$exoID' },
-          overallAverage: { $avg: '$total' },
+          overallAverage: { $avg: '$documentAverage' },
+          totalSum: { $sum: '$total' },
+          totalItemCount: { $sum: '$itemCount' },
         },
       },
     ])
+
     return result.length > 0 ? result[0]?.overallAverage : 0
   } catch (error) {
     logger.error('Error calculating average:', error)
@@ -64,7 +87,7 @@ export const averageSituationalAwarenessByField = async (exoID) => {
   try {
     const result = await SituationalAwareness.aggregate([
       {
-        $match: { exoID: exoID },
+        $match: { exoID },
       },
       {
         $group: {

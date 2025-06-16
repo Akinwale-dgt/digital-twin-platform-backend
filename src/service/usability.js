@@ -2,75 +2,99 @@ import Usability from '../models/usability.js'
 import logger from '../utils/customLogger.js'
 
 export const createUsability = async (data) => {
-  const { sessionID, exoID, ...rest } = data;
+  const { sessionID, exoID, ...rest } = data
 
   if (!sessionID) {
-    throw new Error('sessionId is required');
+    throw new Error('sessionId is required')
   }
-
 
   const usability = await Usability.findOneAndUpdate(
     { sessionID, exoID },
-    { $set: { ...rest, exoID, sessionID } }, 
+    { $set: { ...rest, exoID, sessionID } },
     {
       new: true,
       upsert: true,
       setDefaultsOnInsert: true,
-    }
-  );
+    },
+  )
 
   return usability
 }
 
 export const getUsability = async (data) => {
-  const { sessionID, exoID } = data;
+  const { sessionID, exoID } = data
 
   if (!sessionID) {
-    throw new Error('sessionId is required');
+    throw new Error('sessionId is required')
   }
 
-  const discomfort = await Usability.findOne(
-    { sessionID, exoID}
-  );
+  const discomfort = await Usability.findOne({ sessionID, exoID })
 
-  return discomfort;
-};
+  return discomfort
+}
 
-
-export const averageUsability = async () => {
+export const averageUsability = async (exoID) => {
   try {
     const result = await Usability.aggregate([
       {
+        $match: { exoID },
+      },
+      {
         $addFields: {
-          total: {
-            $sum: [
-              '$ease_of_use.don_and_doff',
-              '$ease_of_use.adjust_fitting',
-              '$ease_of_use.works_as_expected',
-              '$ease_of_use.meets_need',
-              '$ease_of_use.accomplish_task',
-              '$ease_of_use.without_assistance',
-              '$ease_of_use.work_with',
-              '$comfort.restricts_movement',
-              '$comfort.interfere_with_environment',
-              '$comfort.satisfaction',
-              '$ease_of_learning.need_to_learn',
-              '$ease_of_learning.easily_learn_to_assemble',
-              '$ease_of_learning.easily_learn_to_adjust',
-              '$ease_of_learning.easily_learn_checks',
-              '$ease_of_learning.remember_how_to_use',
-              '$ease_of_learning.use_again_without_assistance',
+          fields: [
+            '$ease_of_use.don_and_doff',
+            '$ease_of_use.adjust_fitting',
+            '$ease_of_use.works_as_expected',
+            '$ease_of_use.meets_need',
+            '$ease_of_use.accomplish_task',
+            '$ease_of_use.without_assistance',
+            '$ease_of_use.work_with',
+            '$comfort.restricts_movement',
+            '$comfort.interfere_with_environment',
+            '$comfort.satisfaction',
+            '$ease_of_learning.need_to_learn',
+            '$ease_of_learning.easily_learn_to_assemble',
+            '$ease_of_learning.easily_learn_to_adjust',
+            '$ease_of_learning.easily_learn_checks',
+            '$ease_of_learning.remember_how_to_use',
+            '$ease_of_learning.use_again_without_assistance',
+          ],
+        },
+      },
+      {
+        $addFields: {
+          validFields: {
+            $filter: {
+              input: '$fields',
+              cond: { $ne: ['$this', null] },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          total: { $sum: '$validFields' },
+          itemCount: { $size: '$validFields' },
+          documentAverage: {
+            $cond: [
+              { $gt: [{ $size: '$validFields' }, 0] },
+              { $divide: [{ $sum: '$validFields' }, { $size: '$validFields' }] },
+              0,
             ],
           },
         },
       },
       {
         $group: {
-          _id: null,
-          overallAverage: { $avg: '$total' },
+          _id: '$exoID',
+          exoID: { $first: '$exoID' },
+          overallAverage: { $avg: '$documentAverage' },
+          totalSum: { $sum: '$total' },
+          totalItemCount: { $sum: '$itemCount' },
         },
       },
     ])
+
     return result.length > 0 ? result[0]?.overallAverage : 0
   } catch (error) {
     logger.error('Error calculating average:', error)

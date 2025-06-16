@@ -2,11 +2,11 @@ import Bull from 'bull'
 // import path from 'path'
 // import { fileURLToPath } from 'url'
 import Report from '../models/report.js'
-import generateReport from '../service/report.js'
-import inferredAnalysis from '../service/inferredAnalysis.js'
+import llmGenerateReport from '../service/report.js'
+import llmInferredAnalysis from '../service/inferredAnalysis.js'
 // import generatePDF from '../utils/generatePdfV3.js'
 import logger from '../utils/customLogger.js'
-import { buildReadableTable, calculateCriterionSums, calculateDivergence, calculateEntropyComponents, calculateFinalScores, calculateTotalEntropy, calculateWeights, normalizeTransformedData, serialiseLLMResult } from '../service/calculations.js'
+import { buildReadableTable, calculateCriterionSums, calculateDivergence, calculateEntropyComponents, calculateFinalScores, calculateTotalEntropy, calculateWeights, normalizeTransformedData, renamedBasedOnCriteria, serialiseLLMResult } from '../service/calculations.js'
 
 // Get the directory name equivalent for ES modules
 // const __filename = fileURLToPath(import.meta.url)
@@ -28,9 +28,7 @@ reportGenerationQueue.process(async (job) => {
     await Report.findByIdAndUpdate(reportId, { status: 'processing' })
 
     // Inferred analysis data
-    const inferredAnalysisData = await inferredAnalysis(inputData)
-
-    console.log('inferredAnalysisData', inferredAnalysisData)
+    const inferredAnalysisData = await llmInferredAnalysis(inputData)
 
     const llmResult = serialiseLLMResult(inferredAnalysisData)
 
@@ -46,17 +44,14 @@ reportGenerationQueue.process(async (job) => {
 
     const calculatedWeight = calculateWeights(calculatedDivergence)
 
-    const finalScore = calculateFinalScores(normalizationCompletion, calculatedWeight)
+    // const finalScore = calculateFinalScores(normalizationCompletion, calculatedWeight)
 
-    const readableTable = buildReadableTable(normalizationCompletion, calculatedWeight)
+    const criteriaValue = renamedBasedOnCriteria(llmResult.transformedData)
+
+    const readableTable = buildReadableTable(criteriaValue, calculatedWeight)
+
     // Generate the report
-    const reportData = await generateReport(readableTable)
-
-    // Generate PDF
-    // const pdfPath = await generatePDF(reportData, reportId)
-
-    // Store the relative path in the database
-    // const relativePdfPath = path.relative(__dirname, pdfPath)
+    const reportData = await llmGenerateReport(readableTable)
 
     // Update the report in the database
     await Report.findByIdAndUpdate(reportId, {

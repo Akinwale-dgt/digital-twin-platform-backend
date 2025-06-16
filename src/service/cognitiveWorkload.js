@@ -1,4 +1,3 @@
-import { csv2json } from 'json-2-csv'
 // import dwt from 'discrete-wavelets'
 import CognitiveWorkload from '../models/cognitiveWorkload.js'
 import logger from '../utils/customLogger.js'
@@ -97,25 +96,3 @@ export const averageCognitiveWorkloadByField = async (exoID) => {
     throw error
   }
 }
-
-// function parseNumeric(value) {
-//   const parsed = parseFloat(value)
-//   return Number.isNaN(parsed) ? 0 : parsed
-// }
-
-// export async function processCognitiveWorkloadData(csvData) {
-//   const jsonData = await csv2json(csvData)
-//   const wavelet = 'db4'
-
-//   // Identify EEG channels (all columns except 'time')
-//   const channels = Object.keys(jsonData[0]).filter((key) => key !== 'time')
-
-//   // Extract and transform data for each channel
-//   const transformedData = channels.map((channel) => {
-//     const channelData = jsonData.map((row) => parseNumeric(row[channel]))
-//     // Apply Discrete Wavelet Transform to each channel's data
-//     return dwt.dwt(channelData, wavelet)
-//   })
-
-//   return transformedData
-// }

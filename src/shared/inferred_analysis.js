@@ -26,6 +26,7 @@ export const createInferredAnalysisOutputParser = () => {
           exertion_ppg_eda: z.number(),
           usability: z.number(),
           performance: z.number(),
+          discomfort: z.number(),
         }),
       }),
     ),

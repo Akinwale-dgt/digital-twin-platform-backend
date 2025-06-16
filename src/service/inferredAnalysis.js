@@ -7,14 +7,10 @@ import logger from '../utils/customLogger.js'
 import model from '../shared/openai.js'
 
 // Function to generate the report using OpenAI and LangChain
-async function inferredAnalysis(inputData) {
+async function llmInferredAnalysis(inputData) {
   try {
     const parser = createInferredAnalysisOutputParser()
     const prompt = createInferredAnalysisPromptTemplate()
-
-    // await prompt.format({
-    //   input_data: JSON.stringify(inputData),
-    // })
 
     const chain = RunnableSequence.from([prompt, model, parser])
     // const chain = RunnableSequence.from([prompt, model])
@@ -31,4 +27,4 @@ async function inferredAnalysis(inputData) {
   }
 }
 
-export default inferredAnalysis
+export default llmInferredAnalysis
