@@ -6,7 +6,7 @@ import llmGenerateReport from '../service/report.js'
 import llmInferredAnalysis from '../service/inferredAnalysis.js'
 // import generatePDF from '../utils/generatePdfV3.js'
 import logger from '../utils/customLogger.js'
-import { buildReadableTable, calculateCriterionSums, calculateDivergence, calculateEntropyComponents, calculateFinalScores, calculateTotalEntropy, calculateWeights, normalizeTransformedData, renamedBasedOnCriteria, serialiseLLMResult } from '../service/calculations.js'
+import { buildReadableTable, calculateCriterionSums, calculateDivergence, calculateEntropyComponents, calculateTotalEntropy, calculateWeights, normalizeTransformedData, renamedBasedOnCriteria, serialiseLLMResult } from '../service/calculations.js'
 
 // Get the directory name equivalent for ES modules
 // const __filename = fileURLToPath(import.meta.url)
