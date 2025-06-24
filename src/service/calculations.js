@@ -131,6 +131,119 @@ export function calculateCriterionSums(data) {
   return sums
 }
 
+export function createPairwise7x7Matrix(ratings) {
+  const matrix = {}
+
+  for (let i = 1; i <= 7; i++) {
+    for (let j = 1; j <= 7; j++) {
+      const key = `C${i}_C${j}`
+      const inverseKey = `C${j}_C${i}`
+      if (i === j) {
+        matrix[key] = 1
+      } else {
+        matrix[key] = ratings[key] || 1 / ratings[inverseKey] || 0
+      }
+      const sumByKeyJ = `C${j}_sum_columns`
+      matrix[sumByKeyJ] = matrix[key] + (matrix[sumByKeyJ] || 0)
+    }
+  }
+
+  return matrix
+}
+
+export function calculateRowProducts(ratingsResults) {
+  const rowProduct = {}
+
+  for (let i = 1; i <= 7; i++) {
+    const eachRowColumn = `C${i}_sum_rows`
+    for (let j = 1; j <= 7; j++) {
+      const key = `C${i}_C${j}`
+      rowProduct[eachRowColumn] = (rowProduct[eachRowColumn] || 1) * ratingsResults[key]
+    }
+  }
+
+  return rowProduct
+}
+
+export function calculatePriorityVectorsOfRowProducts(rowProduct) {
+  const priorityVectors = {}
+
+  for (let i = 1; i <= 7; i++) {
+    const eachRowProduct = `C${i}_sum_rows`
+    const eachVectorKey = `C${i}`
+    priorityVectors[eachVectorKey] = rowProduct[eachRowProduct]**(1 / 7)
+  }
+
+  return priorityVectors
+}
+
+
+export function sumPriorityVectors(priorityVectors) {
+  let totalVector = 0
+
+  for (let i = 1; i <= 7; i++) {
+    const eachVectorKey = `C${i}`
+    totalVector += priorityVectors[eachVectorKey]
+  }
+
+  return totalVector
+}
+
+
+export function calculateWeightsOfPriorityVectors(priorityVectors, totalVector) {
+  const weights = {}
+
+  for (let i = 1; i <= 7; i++) {
+    const eachVectorKey = `C${i}`
+    weights[eachVectorKey] = priorityVectors[eachVectorKey] / totalVector
+  }
+
+  return weights
+}
+
+
+export function normalizeAndSumPairwise7x7Matrix(ratingsResults) {
+  const matrix = {}
+
+  for (let i = 1; i <= 7; i++) {
+    const sumByKeyI = `C${i}_sum_rows`
+    for (let j = 1; j <= 7; j++) {
+      const key = `C${i}_C${j}`
+      const sumByKeyJ = `C${j}_sum_columns`
+      matrix[key] = ratingsResults[key] / ratingsResults[sumByKeyJ]
+      matrix[sumByKeyI] = (matrix[sumByKeyI] || 0) + matrix[key]
+    }
+  }
+
+  return matrix
+}
+
+export function calculateWeightsOfNormalizedSum(normalizedSumRatings) {
+  const weight = {}
+
+  for (let i = 1; i <= 7; i++) {
+    const sumByKeyI = `C${i}_sum_rows`
+    const keyI = `C${i}`
+    weight[keyI] = normalizedSumRatings[sumByKeyI] / 7
+  }
+
+  return weight
+}
+
+export function scoreComputationData(data, weights) {
+  return data.map((exo) => ({
+    exoID: exo.exoID,
+    C1: exo.reducedExertion * weights.C1,
+    C2: exo.lightCognitiveLoad * weights.C2,
+    C3: exo.stability * weights.C3,
+    C4: exo.compatibility * weights.C4,
+    C5: exo.easeOfUse * weights.C5,
+    C6: exo.productivity * weights.C6,
+    C7: exo.comfort * weights.C7,
+    // C8: exo.reducedWMSDs / weights.C8,
+  }))
+}
+
 export function normalizeTransformedData(data, criterionSums) {
   return data.map((exo) => ({
     exoID: exo.exoID,
@@ -225,14 +338,14 @@ export function buildReadableTable(criteriaValue, weights) {
     C5: 'easeOfUse',
     C6: 'productivity',
     C7: 'comfort',
-    C8: 'reducedWMSDs',
+    // C8: 'reducedWMSDs',
   }
 
   return criteriaValue.map((exo) => {
     const readable = { exoID: exo.exoID }
     let total = 0
 
-    for (let i = 1; i <= 8; i++) {
+    for (let i = 1; i <= 7; i++) {
       const key = `C${i}`
       const readableKey = criterionMap[key]
       const criterionValue = exo[key]

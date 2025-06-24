@@ -63,7 +63,7 @@ const analyzeDataController = async (req, res, next) => {
 
     // // Add the report generation job to the queue
     await reportGenerationQueue.add(
-      { reportId: report._id, inputData: results },
+      { reportId: report._id, inputData: results, ratings: req.body },
       { attempts: 3, backoff: { type: 'exponential', delay: 5000 } },
     )
 

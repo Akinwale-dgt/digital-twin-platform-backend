@@ -17,6 +17,7 @@ import resetSubjectiveController from '../controllers/reset.js'
 import analyzeDataController from '../controllers/analyze.js'
 import { getReportController, reportStatusController } from '../controllers/report.js'
 import validateCreateUsabilityRoute from '../validators/usability.js'
+import validateCreateRatingsRoute from '../validators/ratings.js'
 
 
 const router = express.Router()
@@ -60,7 +61,8 @@ router.get('/usability/:id', getUsabilityController)
 // router.get('/analyze-subjective-data', analyzeSubjectiveData)
 
 // router.post('/analyze-data', analyzeDataController)
-router.get('/analyze-data', analyzeDataController)
+// router.get('/analyze-data', analyzeDataController)
+router.post('/analyze-data', validateCreateRatingsRoute(), analyzeDataController)
 
 // API endpoint to check report status
 router.get('/report/:reportId/status', reportStatusController)
