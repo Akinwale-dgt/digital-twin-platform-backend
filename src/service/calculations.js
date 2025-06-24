@@ -110,27 +110,6 @@ export function renamedBasedOnCriteria(data) {
   }))
 }
 
-export function calculateCriterionSums(data) {
-  const criteria = {
-    C1: 'reducedExertion',
-    C2: 'lightCognitiveLoad',
-    C3: 'stability',
-    C4: 'compatibility',
-    C5: 'easeOfUse',
-    C6: 'productivity',
-    C7: 'comfort',
-    C8: 'reducedWMSDs',
-  }
-
-  const sums = {}
-
-  for (const [key, field] of Object.entries(criteria)) {
-    sums[key] = data.reduce((acc, exo) => acc + (exo[field] ?? 0), 0)
-  }
-
-  return sums
-}
-
 export function createPairwise7x7Matrix(ratings) {
   const matrix = {}
 
@@ -177,7 +156,6 @@ export function calculatePriorityVectorsOfRowProducts(rowProduct) {
   return priorityVectors
 }
 
-
 export function sumPriorityVectors(priorityVectors) {
   let totalVector = 0
 
@@ -189,7 +167,6 @@ export function sumPriorityVectors(priorityVectors) {
   return totalVector
 }
 
-
 export function calculateWeightsOfPriorityVectors(priorityVectors, totalVector) {
   const weights = {}
 
@@ -200,134 +177,6 @@ export function calculateWeightsOfPriorityVectors(priorityVectors, totalVector) 
 
   return weights
 }
-
-
-export function normalizeAndSumPairwise7x7Matrix(ratingsResults) {
-  const matrix = {}
-
-  for (let i = 1; i <= 7; i++) {
-    const sumByKeyI = `C${i}_sum_rows`
-    for (let j = 1; j <= 7; j++) {
-      const key = `C${i}_C${j}`
-      const sumByKeyJ = `C${j}_sum_columns`
-      matrix[key] = ratingsResults[key] / ratingsResults[sumByKeyJ]
-      matrix[sumByKeyI] = (matrix[sumByKeyI] || 0) + matrix[key]
-    }
-  }
-
-  return matrix
-}
-
-export function calculateWeightsOfNormalizedSum(normalizedSumRatings) {
-  const weight = {}
-
-  for (let i = 1; i <= 7; i++) {
-    const sumByKeyI = `C${i}_sum_rows`
-    const keyI = `C${i}`
-    weight[keyI] = normalizedSumRatings[sumByKeyI] / 7
-  }
-
-  return weight
-}
-
-export function scoreComputationData(data, weights) {
-  return data.map((exo) => ({
-    exoID: exo.exoID,
-    C1: exo.reducedExertion * weights.C1,
-    C2: exo.lightCognitiveLoad * weights.C2,
-    C3: exo.stability * weights.C3,
-    C4: exo.compatibility * weights.C4,
-    C5: exo.easeOfUse * weights.C5,
-    C6: exo.productivity * weights.C6,
-    C7: exo.comfort * weights.C7,
-    // C8: exo.reducedWMSDs / weights.C8,
-  }))
-}
-
-export function normalizeTransformedData(data, criterionSums) {
-  return data.map((exo) => ({
-    exoID: exo.exoID,
-    C1: exo.reducedExertion / criterionSums.C1,
-    C2: exo.lightCognitiveLoad / criterionSums.C2,
-    C3: exo.stability / criterionSums.C3,
-    C4: exo.compatibility / criterionSums.C4,
-    C5: exo.easeOfUse / criterionSums.C5,
-    C6: exo.productivity / criterionSums.C6,
-    C7: exo.comfort / criterionSums.C7,
-    C8: exo.reducedWMSDs / criterionSums.C8,
-  }))
-}
-
-export function calculateEntropyComponents(normalizedData) {
-  return normalizedData.map((exo) => {
-    const result = { exoID: exo.exoID }
-
-    for (let i = 1; i <= 8; i++) {
-      const key = `C${i}`
-      const value = exo[key]
-      result[key] = value > 0 ? value * Math.log(value) : 0
-    }
-
-    return result
-  })
-}
-
-export function calculateTotalEntropy(entropyComponents) {
-  const K = 1 / Math.log(3)
-  const result = {}
-
-  for (let i = 1; i <= 8; i++) {
-    const key = `C${i}`
-
-    const sum = entropyComponents.reduce((acc, exo) => {
-      const val = exo[key]
-      return acc + (typeof val === 'number' ? val : 0)
-    }, 0)
-
-    result[key] = -K * sum
-  }
-
-  return result
-}
-
-export function calculateDivergence(totalEntropy) {
-  const divergence = {}
-
-  for (let i = 1; i <= 8; i++) {
-    const key = `C${i}`
-    divergence[key] = 1 - totalEntropy[key]
-  }
-
-  return divergence
-}
-
-export function calculateWeights(divergence) {
-  const weight = {}
-  const sumOfDivergence = Object.values(divergence).reduce((sum, val) => sum + val, 0)
-
-  for (let i = 1; i <= 8; i++) {
-    const key = `C${i}`
-    weight[key] = divergence[key] / sumOfDivergence
-  }
-
-  return weight
-}
-
-// export function calculateFinalScores(normalizedData, weights) {
-//   return normalizedData.map((exo) => {
-//     let score = 0
-
-//     for (let i = 1; i <= 8; i++) {
-//       const key = `C${i}`
-//       score += (exo[key] ?? 0) * (weights[key] ?? 0)
-//     }
-
-//     return {
-//       exoID: exo.exoID,
-//       score: parseFloat(score.toFixed(4)),
-//     }
-//   })
-// }
 
 export function buildReadableTable(criteriaValue, weights) {
   const criterionMap = {
