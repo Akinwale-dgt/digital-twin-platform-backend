@@ -110,111 +110,73 @@ export function renamedBasedOnCriteria(data) {
   }))
 }
 
-export function calculateCriterionSums(data) {
-  const criteria = {
-    C1: 'reducedExertion',
-    C2: 'lightCognitiveLoad',
-    C3: 'stability',
-    C4: 'compatibility',
-    C5: 'easeOfUse',
-    C6: 'productivity',
-    C7: 'comfort',
-    C8: 'reducedWMSDs',
-  }
+export function createPairwise7x7Matrix(ratings) {
+  const matrix = {}
 
-  const sums = {}
-
-  for (const [key, field] of Object.entries(criteria)) {
-    sums[key] = data.reduce((acc, exo) => acc + (exo[field] ?? 0), 0)
-  }
-
-  return sums
-}
-
-export function normalizeTransformedData(data, criterionSums) {
-  return data.map((exo) => ({
-    exoID: exo.exoID,
-    C1: exo.reducedExertion / criterionSums.C1,
-    C2: exo.lightCognitiveLoad / criterionSums.C2,
-    C3: exo.stability / criterionSums.C3,
-    C4: exo.compatibility / criterionSums.C4,
-    C5: exo.easeOfUse / criterionSums.C5,
-    C6: exo.productivity / criterionSums.C6,
-    C7: exo.comfort / criterionSums.C7,
-    C8: exo.reducedWMSDs / criterionSums.C8,
-  }))
-}
-
-export function calculateEntropyComponents(normalizedData) {
-  return normalizedData.map((exo) => {
-    const result = { exoID: exo.exoID }
-
-    for (let i = 1; i <= 8; i++) {
-      const key = `C${i}`
-      const value = exo[key]
-      result[key] = value > 0 ? value * Math.log(value) : 0
+  for (let i = 1; i <= 7; i++) {
+    for (let j = 1; j <= 7; j++) {
+      const key = `C${i}_C${j}`
+      const inverseKey = `C${j}_C${i}`
+      if (i === j) {
+        matrix[key] = 1
+      } else {
+        matrix[key] = ratings[key] || 1 / ratings[inverseKey] || 0
+      }
+      const sumByKeyJ = `C${j}_sum_columns`
+      matrix[sumByKeyJ] = matrix[key] + (matrix[sumByKeyJ] || 0)
     }
-
-    return result
-  })
-}
-
-export function calculateTotalEntropy(entropyComponents) {
-  const K = 1 / Math.log(3)
-  const result = {}
-
-  for (let i = 1; i <= 8; i++) {
-    const key = `C${i}`
-
-    const sum = entropyComponents.reduce((acc, exo) => {
-      const val = exo[key]
-      return acc + (typeof val === 'number' ? val : 0)
-    }, 0)
-
-    result[key] = -K * sum
   }
 
-  return result
+  return matrix
 }
 
-export function calculateDivergence(totalEntropy) {
-  const divergence = {}
+export function calculateRowProducts(ratingsResults) {
+  const rowProduct = {}
 
-  for (let i = 1; i <= 8; i++) {
-    const key = `C${i}`
-    divergence[key] = 1 - totalEntropy[key]
+  for (let i = 1; i <= 7; i++) {
+    const eachRowColumn = `C${i}_sum_rows`
+    for (let j = 1; j <= 7; j++) {
+      const key = `C${i}_C${j}`
+      rowProduct[eachRowColumn] = (rowProduct[eachRowColumn] || 1) * ratingsResults[key]
+    }
   }
 
-  return divergence
+  return rowProduct
 }
 
-export function calculateWeights(divergence) {
-  const weight = {}
-  const sumOfDivergence = Object.values(divergence).reduce((sum, val) => sum + val, 0)
+export function calculatePriorityVectorsOfRowProducts(rowProduct) {
+  const priorityVectors = {}
 
-  for (let i = 1; i <= 8; i++) {
-    const key = `C${i}`
-    weight[key] = divergence[key] / sumOfDivergence
+  for (let i = 1; i <= 7; i++) {
+    const eachRowProduct = `C${i}_sum_rows`
+    const eachVectorKey = `C${i}`
+    priorityVectors[eachVectorKey] = rowProduct[eachRowProduct]**(1 / 7)
   }
 
-  return weight
+  return priorityVectors
 }
 
-// export function calculateFinalScores(normalizedData, weights) {
-//   return normalizedData.map((exo) => {
-//     let score = 0
+export function sumPriorityVectors(priorityVectors) {
+  let totalVector = 0
 
-//     for (let i = 1; i <= 8; i++) {
-//       const key = `C${i}`
-//       score += (exo[key] ?? 0) * (weights[key] ?? 0)
-//     }
+  for (let i = 1; i <= 7; i++) {
+    const eachVectorKey = `C${i}`
+    totalVector += priorityVectors[eachVectorKey]
+  }
 
-//     return {
-//       exoID: exo.exoID,
-//       score: parseFloat(score.toFixed(4)),
-//     }
-//   })
-// }
+  return totalVector
+}
+
+export function calculateWeightsOfPriorityVectors(priorityVectors, totalVector) {
+  const weights = {}
+
+  for (let i = 1; i <= 7; i++) {
+    const eachVectorKey = `C${i}`
+    weights[eachVectorKey] = priorityVectors[eachVectorKey] / totalVector
+  }
+
+  return weights
+}
 
 export function buildReadableTable(criteriaValue, weights) {
   const criterionMap = {
@@ -225,14 +187,14 @@ export function buildReadableTable(criteriaValue, weights) {
     C5: 'easeOfUse',
     C6: 'productivity',
     C7: 'comfort',
-    C8: 'reducedWMSDs',
+    // C8: 'reducedWMSDs',
   }
 
   return criteriaValue.map((exo) => {
     const readable = { exoID: exo.exoID }
     let total = 0
 
-    for (let i = 1; i <= 8; i++) {
+    for (let i = 1; i <= 7; i++) {
       const key = `C${i}`
       const readableKey = criterionMap[key]
       const criterionValue = exo[key]

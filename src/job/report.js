@@ -6,7 +6,16 @@ import llmGenerateReport from '../service/report.js'
 import llmInferredAnalysis from '../service/inferredAnalysis.js'
 // import generatePDF from '../utils/generatePdfV3.js'
 import logger from '../utils/customLogger.js'
-import { buildReadableTable, calculateCriterionSums, calculateDivergence, calculateEntropyComponents, calculateTotalEntropy, calculateWeights, normalizeTransformedData, renamedBasedOnCriteria, serialiseLLMResult } from '../service/calculations.js'
+import {
+  buildReadableTable,
+  calculatePriorityVectorsOfRowProducts,
+  calculateRowProducts,
+  calculateWeightsOfPriorityVectors,
+  createPairwise7x7Matrix,
+  renamedBasedOnCriteria,
+  serialiseLLMResult,
+  sumPriorityVectors,
+} from '../service/calculations.js'
 
 // Get the directory name equivalent for ES modules
 // const __filename = fileURLToPath(import.meta.url)
@@ -21,7 +30,7 @@ const reportGenerationQueue = new Bull('report-generation', {
 })
 
 reportGenerationQueue.process(async (job) => {
-  const { reportId, inputData } = job.data
+  const { reportId, inputData, ratings } = job.data
 
   try {
     // Update report status to processing
@@ -32,17 +41,27 @@ reportGenerationQueue.process(async (job) => {
 
     const llmResult = serialiseLLMResult(inferredAnalysisData)
 
-    const calculatedCriterion = calculateCriterionSums(llmResult.transformedData)
+    const pairwise7x7Matrix = createPairwise7x7Matrix(ratings)
 
-    const normalizationCompletion = normalizeTransformedData(llmResult.transformedData, calculatedCriterion)
+    const rowProduct = calculateRowProducts(pairwise7x7Matrix)
 
-    const entropyComponents = calculateEntropyComponents(normalizationCompletion)
-    // Step 4: Total entropy per criterion
-    const totalEntropy = calculateTotalEntropy(entropyComponents)
+    const priorityVectors = calculatePriorityVectorsOfRowProducts(rowProduct)
 
-    const calculatedDivergence = calculateDivergence(totalEntropy)
+    const vectorSum = sumPriorityVectors(priorityVectors)
 
-    const calculatedWeight = calculateWeights(calculatedDivergence)
+    const calculatedWeight = calculateWeightsOfPriorityVectors(priorityVectors, vectorSum)
+
+    // const calculatedCriterion = calculateCriterionSums(llmResult.transformedData)
+
+    // const normalizationCompletion = normalizeTransformedData(llmResult.transformedData, calculatedCriterion)
+
+    // const entropyComponents = calculateEntropyComponents(normalizationCompletion)
+    // // Step 4: Total entropy per criterion
+    // const totalEntropy = calculateTotalEntropy(entropyComponents)
+
+    // const calculatedDivergence = calculateDivergence(totalEntropy)
+
+    // const calculatedWeight = calculateWeights(calculatedDivergence)
 
     // const finalScore = calculateFinalScores(normalizationCompletion, calculatedWeight)
 
