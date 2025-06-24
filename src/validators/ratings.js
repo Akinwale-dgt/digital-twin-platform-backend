@@ -38,13 +38,8 @@ const validateCreateRatingsRoute = () => {
       .withMessage('Reduced Exertion compared to Productivity is required')
       .isInt()
       .withMessage('Reduced Exertion compared to Productivity must be an integer'),
-  
 
-
-    body('C2_C2')
-      .default(1)
-      .withMessage('Light Cognitive Load to Light Cognitive Load is required')
-      .withMessage('Light Cognitive Load to Light Cognitive Load must be an integer'),
+    body('C2_C2').default(1),
 
     body('C2_C3')
       .exists()
@@ -76,13 +71,7 @@ const validateCreateRatingsRoute = () => {
       .isInt()
       .withMessage('Light Cognitive Load to Productivity must be an integer'),
 
-
-
-
-    body('C3_C3')
-      .default(1)
-      .withMessage('Light Cognitive Load to Light Cognitive Load is required')
-      .withMessage('Light Cognitive Load to Light Cognitive Load must be an integer'),
+    body('C3_C3').default(1),
 
     body('C3_C4')
       .exists()
@@ -108,12 +97,7 @@ const validateCreateRatingsRoute = () => {
       .isInt()
       .withMessage('Light Cognitive Load to Productivity must be an integer'),
 
-
-
-    body('C4_C4')
-      .default(1)
-      .withMessage('Light Cognitive Load to Compatibility is required')
-      .withMessage('Light Cognitive Load to Compatibility must be an integer'),
+    body('C4_C4').default(1),
 
     body('C4_C5')
       .exists()
@@ -133,12 +117,7 @@ const validateCreateRatingsRoute = () => {
       .isInt()
       .withMessage('Light Cognitive Load to Productivity must be an integer'),
 
-
-
-    body('C5_C5')
-      .default(1)
-      .withMessage('Light Cognitive Load to Ease of Use is required')
-      .withMessage('Light Cognitive Load to Ease of Use must be an integer'),
+    body('C5_C5').default(1),
 
     body('C5_C6')
       .exists()
@@ -152,13 +131,7 @@ const validateCreateRatingsRoute = () => {
       .isInt()
       .withMessage('Light Cognitive Load to Productivity must be an integer'),
 
-
-
-
-    body('C6_C6')
-      .default(1)
-      .withMessage('Light Cognitive Load to Productivity is required')
-      .withMessage('Light Cognitive Load to Productivity must be an integer'),
+    body('C6_C6').default(1),
 
     body('C6_C7')
       .exists()
@@ -166,13 +139,7 @@ const validateCreateRatingsRoute = () => {
       .isInt()
       .withMessage('Light Cognitive Load to Productivity must be an integer'),
 
-
-
-    body('C7_C7')
-      .default(1)
-      .withMessage('Light Cognitive Load to Productivity is required')
-      .withMessage('Light Cognitive Load to Productivity must be an integer'),
-
+    body('C7_C7').default(1),
 
     (req, res, next) => {
       const errors = validationResult(req)
