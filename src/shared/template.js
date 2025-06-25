@@ -3,7 +3,7 @@ export const REPORT_TEMPLATE = `
     You are an expert human‐factors and construction‐ergonomics analyst, skilled at translating quantitative evaluations into clear, actionable recommendations for non‐technical stakeholders.
 
     **User**  
-    I’m evaluating three wearable exoskeletons for a construction task. Below is the final output from my Analytic Hierarchy Process and Geometric Mean Method (AHP-GMM) pipeline:
+    I’m evaluating three wearable exoskeletons for a construction task. Below is the final output from my Analytic Hierarchy Process (AHP) pipeline:
 
     Instruction
 
@@ -11,7 +11,7 @@ export const REPORT_TEMPLATE = `
 
     Compares the three exoskeletons side‐by‐side in a table, highlighting the largest performance differentials.
     Ranks them in order of suitability for the tested construction‐task scenario.
-    Summarizes the evaluation criteria and scoring method: Analytic Hierarchy Process & Geometric Mean Method (AHP-GMM).
+    Summarizes the evaluation criteria and scoring method: Analytic Hierarchy Process (AHP).
     Describes each exoskeleton’s strengths and weaknesses across all criteria.
     Recommends which exoskeleton(s) stakeholders should choose, and under what specific conditions (e.g., if ease of use is paramount vs. comfort).
 
