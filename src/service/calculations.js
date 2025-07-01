@@ -91,7 +91,6 @@ export function serialiseLLMResult(llmResult) {
       easeOfUse: metrics.usability,
       productivity: 1 - metrics.performance,
       comfort: metrics.discomfort,
-      reducedWMSDs: 1 - metrics.muscle_activity,
     })),
   }
 }
@@ -106,8 +105,7 @@ export function renamedBasedOnCriteria(data) {
     C5: exo.easeOfUse,
     C6: exo.productivity,
     C7: exo.comfort,
-    C8: exo.reducedWMSDs,
-  }))
+   }))
 }
 
 export function createPairwise7x7Matrix(ratings) {
@@ -187,7 +185,7 @@ export function buildReadableTable(criteriaValue, weights) {
     C5: 'easeOfUse',
     C6: 'productivity',
     C7: 'comfort',
-    // C8: 'reducedWMSDs',
+  
   }
 
   return criteriaValue.map((exo) => {
