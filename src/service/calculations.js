@@ -90,7 +90,7 @@ export function serialiseLLMResult(llmResult) {
       compatibility: metrics.range_of_motion,
       easeOfUse: metrics.usability,
       productivity: 1 - metrics.performance,
-      comfort: metrics.discomfort,
+      comfort:1 - metrics.discomfort,
     })),
   }
 }
